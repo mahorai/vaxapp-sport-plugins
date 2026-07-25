@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "[sports] Streamed",
-    version: "1.2.6",
+    version: "1.2.8",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -199,6 +199,7 @@ function parseMovieDetail(html, apiUrl) {
       servers: []
     });
 
+  const id = getSlug(apiUrl, `/api/`);
   const posterUrl = extractParamFromUrl(apiUrl, "posterUrl");
   const title = extractParamFromUrl(apiUrl, "title");
   const category = extractParamFromUrl(apiUrl, "category");
@@ -206,15 +207,14 @@ function parseMovieDetail(html, apiUrl) {
     extractParamFromUrl(apiUrl, "description") + SELECTION_GUIDE;
   const episodes = [];
   const serverName = streams[0].source?.toUpperCase();
-  const id = streams[0].id;
 
   streams.forEach((stream, index) => {
     const embedUrl = stream?.embedUrl;
     const quality = stream?.hd ? "HD" : "SD";
     const viewers = formatViewerCount(stream?.viewers);
     const language = stream.language;
-    const name = `${quality}${viewers ? " - " + viewers + " 👁️" : ""}${language ? " - " + language : ""}`;
-    const slug = `${id}-${index + 1}`;
+    const name = `${quality}${viewers ? " - " + viewers + "👁️" : ""}${language ? " - " + language : ""}`;
+    const slug = `${id}/${index + 1}`;
 
     episodes.push({
       id: embedUrl,
@@ -330,4 +330,10 @@ function filterStreams(streams, keyword) {
     });
   }
   return streams;
+}
+
+function getSlug(apiUrl, keyword) {
+  const index = apiUrl.indexOf(keyword);
+  if (!keyword || index === -1) return "";
+  return apiUrl.substring(index);
 }

@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "[sports] Timstreams",
-    version: "1.1.5",
+    version: "1.1.7",
     baseUrl: BASE_API_URL,
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -152,7 +152,11 @@ function parseMovieDetail(html, apiUrl) {
   const slug = extractParamFromUrl(apiUrl, "slug");
   const stream = getStream(streams, slug) || {};
 
-  const { url, name, logo, genre, time } = stream;
+  const { name, logo, genre, time } = stream;
+  const id =
+    getSlug(apiUrl, `/live-upcoming`) ||
+    getSlug(apiUrl, `/channels`) ||
+    getSlug(apiUrl, `/replays`);
   const type = genre && (data?.genres[genre] || data?.genres[genre]);
   const dateTime =
     data?.events && isLive(time) ? "LIVE" : formatDateTimeGMT7(time);
@@ -170,7 +174,7 @@ function parseMovieDetail(html, apiUrl) {
         servers: []
       });
 
-    name = data?.events || data?.replays ? name : `Link - ${index + 1}`;
+    name = data?.events || data?.replays ? name : `${stream.name} - ${name}`;
     const slug = `${stream.url}-${index + 1}`;
 
     episodes.push({
@@ -183,7 +187,7 @@ function parseMovieDetail(html, apiUrl) {
   const servers = [{ name: "Timstreams", episodes: episodes }];
 
   return JSON.stringify({
-    id: url,
+    id: id,
     title: name,
     posterUrl: logo || FALLBACK_POSTER_URL,
     backdropUrl: logo || FALLBACK_POSTER_URL,
@@ -268,4 +272,10 @@ function filterStreams(streams, keyword) {
   }
 
   return streams;
+}
+
+function getSlug(apiUrl, keyword) {
+  const index = apiUrl.indexOf(keyword);
+  if (!keyword || index === -1) return "";
+  return apiUrl.substring(index);
 }
