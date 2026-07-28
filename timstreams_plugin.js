@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "[sports] Timstreams",
-    version: "1.1.7",
+    version: "1.1.8",
     baseUrl: BASE_API_URL,
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -214,7 +214,7 @@ function parseDetailResponse(html, sourceUrl) {
       "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
       "X-Requested-With": "com.android.chrome"
     },
-    isEmbed: false
+    isEmbed: true
   });
 }
 

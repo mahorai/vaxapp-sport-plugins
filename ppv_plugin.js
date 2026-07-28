@@ -31,7 +31,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "[sports] PPV",
-    version: "1.1.0",
+    version: "1.1.1",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -378,7 +378,7 @@ function parseDetailResponse(html, sourceUrl) {
       "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
       "X-Requested-With": "com.android.chrome"
     },
-    isEmbed: false
+    isEmbed: true
   });
 }
 

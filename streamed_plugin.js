@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "[sports] Streamed",
-    version: "1.2.8",
+    version: "1.2.9",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -253,7 +253,7 @@ function parseDetailResponse(html, sourceUrl) {
       "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
       "X-Requested-With": "com.android.chrome"
     },
-    isEmbed: false
+    isEmbed: true
   });
 }
 
