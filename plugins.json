@@ -3,21 +3,21 @@
   "plugins": [
     {
       "id": "streamed",
-      "name": "[sports] Streamed",
+      "name": "Streamed",
       "version": "1.2.9",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
       "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png"
     },
     {
       "id": "timstreams",
-      "name": "[sports] Timstreams",
+      "name": "Timstreams",
       "version": "1.1.8",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/timstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/qYJ3gnwZ/timstreams-logo.png"
     },
     {
       "id": "ppv",
-      "name": "[sports] PPV",
+      "name": "PPV",
       "version": "1.1.1",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png"
