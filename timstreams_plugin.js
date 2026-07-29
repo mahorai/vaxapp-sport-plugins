@@ -184,7 +184,7 @@ function parseMovieDetail(html, apiUrl) {
     });
   });
 
-  const servers = [{ name: "Timstreams", episodes: episodes }];
+  const servers = [{ name: "ADMIN", episodes: episodes }];
 
   return JSON.stringify({
     id: id,

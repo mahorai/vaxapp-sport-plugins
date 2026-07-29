@@ -37,7 +37,7 @@ function getHomeSections() {
     },
     {
       slug: "fight",
-      title: "Fight (Boxing, UFC, ...) 🥊",
+      title: "Fight (Boxing, MMA, ...v.v) 🥊",
       type: "Horizontal",
       path: ""
     },
@@ -80,7 +80,7 @@ function getHomeSections() {
 
 function getPrimaryCategories() {
   return JSON.stringify([
-    { name: "Fight (Boxing, UFC, ...)", slug: "fight" },
+    { name: "Fight", slug: "fight" },
     { name: "Football", slug: "football" },
     { name: "Basketball", slug: "basketball" },
     { name: "American Football", slug: "american-football" },
