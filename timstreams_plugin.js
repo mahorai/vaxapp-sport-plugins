@@ -9,13 +9,13 @@ const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 function getManifest() {
   return JSON.stringify({
     id: "timstreams",
-    name: "[sports] Timstreams",
+    name: "Timstreams",
     version: "1.1.8",
     baseUrl: BASE_API_URL,
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
     isAdult: false,
-    type: "VIDEO",
+    type: "MOVIE",
     layoutType: "HORIZONTAL",
     playerType: "embedtoexoplay"
   });

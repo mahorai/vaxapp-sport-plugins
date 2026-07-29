@@ -30,13 +30,13 @@ const CATEGORY_MAP = {
 function getManifest() {
   return JSON.stringify({
     id: "ppv",
-    name: "[sports] PPV",
+    name: "PPV",
     version: "1.1.1",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
     isAdult: false,
-    type: "VIDEO",
+    type: "MOVIE",
     layoutType: "HORIZONTAL",
     playerType: "embedtoexoplay"
   });
