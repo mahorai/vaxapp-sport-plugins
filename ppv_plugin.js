@@ -31,8 +31,8 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.1.2",
-    baseUrl: BASE_URL,
+    version: "1.1.4",
+    baseUrl: "https://ppv.st",
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
     isAdult: false,

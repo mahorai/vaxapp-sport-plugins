@@ -10,8 +10,8 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.3.0",
-    baseUrl: BASE_URL,
+    version: "1.3.1",
+    baseUrl: "https://streamed.pk",
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
     isAdult: false,

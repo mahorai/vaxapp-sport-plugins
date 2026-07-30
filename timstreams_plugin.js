@@ -1,5 +1,5 @@
 const BASE_URL = "https://timstreams.st";
-const BASE_API_URL = "https://api.vixnuvew.uk";
+const BASE_API_URL = "https://api.timstreams.st";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 
 // =============================================================================
@@ -10,8 +10,8 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "Timstreams",
-    version: "1.1.9",
-    baseUrl: BASE_API_URL,
+    version: "1.2.0",
+    baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
     isAdult: false,
