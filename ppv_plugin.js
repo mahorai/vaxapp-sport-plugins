@@ -31,7 +31,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.1.1",
+    version: "1.1.2",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -380,10 +380,6 @@ function parseDetailResponse(html, sourceUrl) {
     },
     isEmbed: true
   });
-}
-
-function parseEmbedResponse(html, sourceUrl) {
-  return JSON.stringify({ url: "", isEmbed: false });
 }
 
 function parseCategoriesResponse(html) {

@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.2.9",
+    version: "1.3.0",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -255,10 +255,6 @@ function parseDetailResponse(html, sourceUrl) {
     },
     isEmbed: true
   });
-}
-
-function parseEmbedResponse(html, sourceUrl) {
-  return JSON.stringify({ url: "", isEmbed: false });
 }
 
 function parseCategoriesResponse(html) {
