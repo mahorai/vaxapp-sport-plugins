@@ -25,7 +25,7 @@
     {
       "id": "vietanhtv",
       "name": "VietAnhTV",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/vietanhtv_plugin.js",
       "iconUrl": "https://i.ibb.co/b8dVqVt/vietanhtv-logo.jpg"
     }
