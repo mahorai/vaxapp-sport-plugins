@@ -38,7 +38,7 @@ function getManifest() {
   return JSON.stringify({
     id: "vietanhtv",
     name: "VietAnhTV",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: "https://tv.vietanhtv.top/tv",
     iconUrl: "https://i.ibb.co/b8dVqVt/vietanhtv-logo.jpg",
     isEnabled: true,
@@ -252,6 +252,7 @@ function parseDetailResponse(html, apiUrl) {
   // Value manifest_type = dash or mdp
   // Value license_type = widevine
   else if (licenseType === "widevine") {
+    const licenseUrl = apiUrl.substring(0, apiUrl.indexOf("&channelId"));
     console.log("Name: ", name);
     console.log("Widevine:", apiUrl);
     console.log("URL:", url);
@@ -260,7 +261,7 @@ function parseDetailResponse(html, apiUrl) {
       url: url,
       mimeType: "application/dash+xml",
       drmType: "widevine",
-      licenseUrl: apiUrl,
+      licenseUrl: licenseUrl,
       headers: {
         "User-Agent": userAgent || "Dalvik/2.1.0",
         Referer: referrer || url,
