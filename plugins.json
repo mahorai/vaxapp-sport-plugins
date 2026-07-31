@@ -21,6 +21,13 @@
       "version": "1.1.5",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png"
+    },
+    {
+      "id": "vietanhtv",
+      "name": "VietAnhTV",
+      "version": "1.0.0",
+      "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/vietanhtv_plugin.js",
+      "iconUrl": "https://i.ibb.co/b8dVqVt/vietanhtv-logo.jpg"
     }
   ]
 }
