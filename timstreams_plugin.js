@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "Timstreams",
-    version: "1.2.0",
+    version: "1.2.1",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -21,7 +21,7 @@ function getManifest() {
   });
 }
 
-https: function getHomeSections() {
+function getHomeSections() {
   return JSON.stringify([
     {
       slug: "live-upcoming",

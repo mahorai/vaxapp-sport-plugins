@@ -31,7 +31,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.1.4",
+    version: "1.1.5",
     baseUrl: "https://ppv.st",
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -42,7 +42,7 @@ function getManifest() {
   });
 }
 
-https: function getHomeSections() {
+function getHomeSections() {
   return JSON.stringify([
     {
       slug: "live",
