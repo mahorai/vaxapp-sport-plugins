@@ -1,5 +1,5 @@
-const BASE_URL = "https://timstreams.st";
-const BASE_API_URL = "https://api.timstreams.st";
+const BASE_DOMAIN = "https://timstreams.st";
+const BASE_API_URL = "https://api.timstreams.st/api";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 
 // =============================================================================
@@ -10,7 +10,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "Timstreams",
-    version: "1.2.1",
+    version: "1.2.2",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -61,18 +61,17 @@ function getFilterConfig() {
 // =============================================================================
 
 function getUrlList(slug, filtersJson) {
-  return `${BASE_API_URL}/api/${slug}`;
+  return `${BASE_API_URL}/${slug}`;
 }
 
 function getUrlSearch(keyword, filtersJson) {
-  return `${BASE_API_URL}/api/channels?search=${encodeURIComponent(keyword?.trim())}`;
+  return `${BASE_API_URL}/channels?search=${encodeURIComponent(keyword?.trim())}`;
 }
 
 function getUrlDetail(path) {
   if (!path) return "";
   if (path.indexOf("http") === 0) return path;
-  if (path.charAt(0) !== "/") path = "/" + path;
-  return `${BASE_API_URL}/api${path}`;
+  return `${BASE_API_URL}${path}`;
 }
 
 function getUrlCategories() {
@@ -132,8 +131,8 @@ function parseListResponse(html, apiUrl) {
       items: items,
       pagination: { currentPage: 1, totalPages: 1 }
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log("⛔ [parseListResponse] ERROR MESSAGE: ", error);
     return JSON.stringify({
       items: [],
       pagination: { currentPage: 1, totalPages: 1 }
@@ -146,76 +145,86 @@ function parseSearchResponse(html, apiUrl) {
 }
 
 function parseMovieDetail(html, apiUrl) {
-  const data = JSON.parse(html);
-  const streams = data?.events || data?.replays || data?.channels;
+  try {
+    const data = JSON.parse(html);
+    const streams = data?.events || data?.replays || data?.channels;
 
-  const slug = extractParamFromUrl(apiUrl, "slug");
-  const stream = getStream(streams, slug) || {};
+    const slug = extractParamFromUrl(apiUrl, "slug");
+    const stream = getStream(streams, slug) || {};
 
-  const { name, logo, genre, time } = stream;
-  const id =
-    getSlug(apiUrl, `/live-upcoming`) ||
-    getSlug(apiUrl, `/channels`) ||
-    getSlug(apiUrl, `/replays`);
-  const type = genre && (data?.genres[genre] || data?.genres[genre]);
-  const dateTime =
-    data?.events && isLive(time) ? "LIVE" : formatDateTimeGMT7(time);
-  const description = `Event "${name}" is hosted on server Timstreams`;
-  const episodes = [];
+    const { name, logo, genre, time } = stream;
+    const id =
+      getPath(apiUrl, `/live-upcoming`) ||
+      getPath(apiUrl, `/channels`) ||
+      getPath(apiUrl, `/replays`);
+    const type = genre && (data?.genres[genre] || data?.genres[genre]);
+    const dateTime =
+      data?.events && isLive(time) ? "LIVE" : formatDateTimeGMT7(time);
+    const description = `Event "${name}" is hosted on server Timstreams`;
+    const episodes = [];
 
-  stream.streams?.forEach((item, index) => {
-    let { name, url } = item;
-    if (!url)
-      return JSON.stringify({
-        id: "",
-        title: "⚠️ Stream Link Not Found!",
-        posterUrl: FALLBACK_POSTER_URL,
-        backdropUrl: FALLBACK_POSTER_URL,
-        servers: []
+    stream.streams?.forEach((item, index) => {
+      let { name, url } = item;
+      if (!url)
+        return JSON.stringify({
+          id: "",
+          title: "⚠️ Stream Link Not Found!",
+          posterUrl: FALLBACK_POSTER_URL,
+          backdropUrl: FALLBACK_POSTER_URL,
+          servers: []
+        });
+
+      name = data?.events || data?.replays ? name : `${stream.name} - ${name}`;
+      const slug = `${stream.url}-${index + 1}`;
+
+      episodes.push({
+        id: url,
+        name: name,
+        slug: slug
       });
-
-    name = data?.events || data?.replays ? name : `${stream.name} - ${name}`;
-    const slug = `${stream.url}-${index + 1}`;
-
-    episodes.push({
-      id: url,
-      name: name,
-      slug: slug
     });
-  });
 
-  const servers = [{ name: "ADMIN", episodes: episodes }];
+    const servers = [{ name: "ADMIN", episodes: episodes }];
 
-  return JSON.stringify({
-    id: id,
-    title: name,
-    posterUrl: logo || FALLBACK_POSTER_URL,
-    backdropUrl: logo || FALLBACK_POSTER_URL,
-    quality: type,
-    episode_current: dateTime,
-    description: description,
-    servers: servers
-  });
+    return JSON.stringify({
+      id: id,
+      title: name,
+      posterUrl: logo || FALLBACK_POSTER_URL,
+      backdropUrl: logo || FALLBACK_POSTER_URL,
+      quality: type,
+      episode_current: dateTime,
+      description: description,
+      servers: servers
+    });
+  } catch (error) {
+    console.log("⛔ [parseMovieDetail] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
-function parseDetailResponse(html, sourceUrl) {
-  return JSON.stringify({
-    url: sourceUrl,
-    headers: {
-      Referer: sourceUrl,
-      Origin: sourceUrl,
-      "User-Agent":
-        "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-      "Sec-Ch-Ua":
-        '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-      "Sec-Ch-Ua-Mobile": "?1",
-      "Sec-Ch-Ua-Platform": '"Android"',
-      Accept: "*/*",
-      "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-      "X-Requested-With": "com.android.chrome"
-    },
-    isEmbed: true
-  });
+function parseDetailResponse(html, embedUrl) {
+  try {
+    return JSON.stringify({
+      url: embedUrl,
+      headers: {
+        Referer: embedUrl,
+        Origin: embedUrl,
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Sec-Ch-Ua":
+          '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        "Sec-Ch-Ua-Mobile": "?1",
+        "Sec-Ch-Ua-Platform": '"Android"',
+        Accept: "*/*",
+        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "X-Requested-With": "com.android.chrome"
+      },
+      isEmbed: true
+    });
+  } catch (error) {
+    console.log("⛔ [parseDetailResponse] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
 function parseCategoriesResponse(html) {
@@ -270,7 +279,7 @@ function filterStreams(streams, keyword) {
   return streams;
 }
 
-function getSlug(apiUrl, keyword) {
+function getPath(apiUrl, keyword) {
   const index = apiUrl.indexOf(keyword);
   if (!keyword || index === -1) return "";
   return apiUrl.substring(index);

@@ -1,4 +1,5 @@
-const BASE_URL = "https://streamed.pk";
+const BACKUP_DOMAINS = "https://strmd.link";
+const BASE_API_URL = "https://streamed.pk/api";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const SELECTION_GUIDE = `\n\n✅The format of each live event link is: [VideoQuality - ConcurrentViewers].\n✅Video quality: Prefer at least HD.\n✅Concurrent viewers: higher is better, 1N = 1000 concurrent viewers.`;
 
@@ -10,7 +11,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.3.1",
+    version: "1.3.4",
     baseUrl: "https://streamed.pk",
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -109,18 +110,17 @@ function getFilterConfig() {
 
 function getUrlList(slug, filtersJson) {
   const basePath = "";
-  return `${BASE_URL}/api/matches/${slug}`;
+  return `${BASE_API_URL}/matches/${slug}`;
 }
 
 function getUrlSearch(keyword, filtersJson) {
-  return `${BASE_URL}/api/matches/all?search=${encodeURIComponent(keyword)}`;
+  return `${BASE_API_URL}/matches/all?search=${encodeURIComponent(keyword.trim())}`;
 }
 
 function getUrlDetail(path) {
   if (!path) return "";
   if (path.indexOf("http") === 0) return path;
-  if (path.charAt(0) !== "/") path = "/" + path;
-  return BASE_URL + path;
+  return BASE_API_URL + path;
 }
 
 function getUrlCategories() {
@@ -152,10 +152,12 @@ function parseListResponse(html, apiUrl) {
         Date.now() >= stream?.date ? "LIVE" : formatDateTime(stream?.date);
       const category = stream?.category?.toUpperCase() || "";
 
-      stream.sources.forEach((item) => {
+      for (const item of stream.sources) {
         const serverName = item?.source?.toUpperCase();
+        //remove server echo
+        if (serverName === "ECHO") break;
         const description = `Event "${title}" is hosted on server ${serverName}.`;
-        const path = `/api/stream/${item?.source}/${item?.id}?posterUrl=${encodeURIComponent(posterUrl)}&title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}&description=${encodeURIComponent(description)}`;
+        const path = `/stream/${item?.source}/${item?.id}?posterUrl=${encodeURIComponent(posterUrl)}&title=${encodeURIComponent(title)}&category=${encodeURIComponent(category)}&description=${encodeURIComponent(description)}`;
 
         items.push({
           id: path,
@@ -167,15 +169,15 @@ function parseListResponse(html, apiUrl) {
           episode_current: serverName,
           lang: category
         });
-      });
+      }
     });
 
     return JSON.stringify({
       items: items,
       pagination: { currentPage: 1, totalPages: 1 }
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log("⛔ [parseListResponse] ERROR MESSAGE: ", error);
     return JSON.stringify({
       items: [],
       pagination: { currentPage: 1, totalPages: 1 }
@@ -188,73 +190,83 @@ function parseSearchResponse(html, apiUrl) {
 }
 
 function parseMovieDetail(html, apiUrl) {
-  const streams = JSON.parse(html);
+  try {
+    const streams = JSON.parse(html);
 
-  if (!Array.isArray(streams) || streams.length === 0)
+    if (!Array.isArray(streams) || streams.length === 0)
+      return JSON.stringify({
+        id: "",
+        title: "⚠️ Stream Link Not Found!",
+        posterUrl: FALLBACK_POSTER_URL,
+        backdropUrl: FALLBACK_POSTER_URL,
+        servers: []
+      });
+
+    const id = getPath(apiUrl, `/stream/`);
+    const posterUrl = extractParamFromUrl(apiUrl, "posterUrl");
+    const title = extractParamFromUrl(apiUrl, "title");
+    const category = extractParamFromUrl(apiUrl, "category");
+    const description =
+      extractParamFromUrl(apiUrl, "description") + SELECTION_GUIDE;
+    const episodes = [];
+    const serverName = streams[0].source?.toUpperCase();
+
+    streams.forEach((stream, index) => {
+      const embedUrl = stream?.embedUrl;
+      const quality = stream?.hd ? "HD" : "SD";
+      const viewers = formatViewerCount(stream?.viewers);
+      const language = stream.language;
+      const name = `${quality}${viewers ? " - 🔴 " + viewers : ""}${language ? " - " + language : ""}`;
+      const path = `${id}-${index + 1}`;
+
+      episodes.push({
+        id: embedUrl,
+        name: name,
+        slug: path
+      });
+    });
+
+    const servers = [{ name: serverName, episodes: episodes }];
+
     return JSON.stringify({
-      id: "",
-      title: "⚠️ Stream Link Not Found!",
-      posterUrl: FALLBACK_POSTER_URL,
-      backdropUrl: FALLBACK_POSTER_URL,
-      servers: []
+      id: id,
+      title: title,
+      posterUrl: posterUrl,
+      backdropUrl: posterUrl,
+      lang: serverName,
+      description: description,
+      quality: category,
+      servers: servers
     });
-
-  const id = getSlug(apiUrl, `/api/`);
-  const posterUrl = extractParamFromUrl(apiUrl, "posterUrl");
-  const title = extractParamFromUrl(apiUrl, "title");
-  const category = extractParamFromUrl(apiUrl, "category");
-  const description =
-    extractParamFromUrl(apiUrl, "description") + SELECTION_GUIDE;
-  const episodes = [];
-  const serverName = streams[0].source?.toUpperCase();
-
-  streams.forEach((stream, index) => {
-    const embedUrl = stream?.embedUrl;
-    const quality = stream?.hd ? "HD" : "SD";
-    const viewers = formatViewerCount(stream?.viewers);
-    const language = stream.language;
-    const name = `${quality}${viewers ? " - " + viewers + "👁️" : ""}${language ? " - " + language : ""}`;
-    const slug = `${id}/${index + 1}`;
-
-    episodes.push({
-      id: embedUrl,
-      name: name,
-      slug: slug
-    });
-  });
-
-  const servers = [{ name: serverName, episodes: episodes }];
-
-  return JSON.stringify({
-    id: id,
-    title: title,
-    posterUrl: posterUrl,
-    backdropUrl: posterUrl,
-    lang: serverName,
-    description: description,
-    quality: category,
-    servers: servers
-  });
+  } catch (error) {
+    console.log("⛔ [parseMovieDetail] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
-function parseDetailResponse(html, sourceUrl) {
-  return JSON.stringify({
-    url: sourceUrl,
-    headers: {
-      Referer: sourceUrl,
-      Origin: sourceUrl,
-      "User-Agent":
-        "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-      "Sec-Ch-Ua":
-        '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-      "Sec-Ch-Ua-Mobile": "?1",
-      "Sec-Ch-Ua-Platform": '"Android"',
-      Accept: "*/*",
-      "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-      "X-Requested-With": "com.android.chrome"
-    },
-    isEmbed: true
-  });
+function parseDetailResponse(html, embedUrl) {
+  try {
+    return JSON.stringify({
+      url: embedUrl,
+      headers: {
+        Referer: embedUrl,
+        Origin: embedUrl,
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Sec-Ch-Ua":
+          '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        "Sec-Ch-Ua-Mobile": "?1",
+        "Sec-Ch-Ua-Platform": '"Android"',
+        Accept: "*/*",
+        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "X-Requested-With": "com.android.chrome"
+      },
+      isEmbed: true
+    });
+  } catch (error) {
+    console.log("⛔ [parseDetailResponse] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
 function parseCategoriesResponse(html) {
@@ -273,13 +285,16 @@ function parseYearsResponse(html) {
 
 function getPosterUrl(item) {
   try {
-    if (item?.poster) return BASE_URL + item.poster;
+    if (item?.poster)
+      return (
+        BASE_API_URL + item.poster.substring(item.poster.indexOf("/api/") + 4)
+      );
     const homeTeamLogoSlug = item?.teams?.home?.badge;
     const awayTeamLogoSlug = item?.teams?.away?.badge;
     if (homeTeamLogoSlug && awayTeamLogoSlug)
       return (
-        BASE_URL +
-        `/api/images/poster/${homeTeamLogoSlug}/${awayTeamLogoSlug}.webp`
+        BASE_API_URL +
+        `/images/poster/${homeTeamLogoSlug}/${awayTeamLogoSlug}.webp`
       );
     return FALLBACK_POSTER_URL;
   } catch (e) {
@@ -328,7 +343,7 @@ function filterStreams(streams, keyword) {
   return streams;
 }
 
-function getSlug(apiUrl, keyword) {
+function getPath(apiUrl, keyword) {
   const index = apiUrl.indexOf(keyword);
   if (!keyword || index === -1) return "";
   return apiUrl.substring(index);

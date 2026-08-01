@@ -1,5 +1,5 @@
 const BACKUP_DOMAINS = "https://ppv.domains/";
-const BASE_URL = "https://api.ppv.st";
+const BASE_API_URL = "https://api.ppv.st/api/streams";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 
 const CATEGORY_MAP = {
@@ -31,7 +31,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.1.5",
+    version: "1.1.7",
     baseUrl: "https://ppv.st",
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -195,18 +195,18 @@ function getFilterConfig() {
 // =============================================================================
 
 function getUrlList(slug, filtersJson) {
-  return `${BASE_URL}/api/streams?category=${encodeURIComponent(slug)}`;
+  return `${BASE_API_URL}?category=${encodeURIComponent(slug)}`;
 }
 
 function getUrlSearch(keyword, filtersJson) {
   keyword = keyword?.trim() || "";
-  return `${BASE_URL}/api/streams?search=${encodeURIComponent(keyword)}`;
+  return `${BASE_API_URL}?search=${encodeURIComponent(keyword)}`;
 }
 
 function getUrlDetail(path) {
   if (!path) return "";
   if (path.indexOf("http") === 0) return path;
-  return `${BASE_URL}/api/streams${path}`;
+  return `${BASE_API_URL}${path}`;
 }
 
 function getUrlCategories() {
@@ -276,8 +276,8 @@ function parseListResponse(html, apiUrl) {
       items: items,
       pagination: { currentPage: 1, totalPages: 1 }
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log("⛔ [parseListResponse] ERROR MESSAGE: ", error);
     return JSON.stringify({
       items: [],
       pagination: { currentPage: 1, totalPages: 1 }
@@ -290,96 +290,107 @@ function parseSearchResponse(html, apiUrl) {
 }
 
 function parseMovieDetail(html, apiUrl) {
-  const data = JSON.parse(html);
-  let streams = data.streams;
+  try {
+    const data = JSON.parse(html);
+    let streams = data.streams;
 
-  // filter streams by category
-  const episodes = [];
-  const category = extractParamFromUrl(apiUrl, "category");
-  streams = filterStreams(streams, ["category", category]);
+    // filter streams by category
+    const episodes = [];
+    const category = extractParamFromUrl(apiUrl, "category");
+    streams = filterStreams(streams, ["category", category]);
 
-  // get stream by param id
-  const streamId = extractParamFromUrl(apiUrl, "id");
-  const stream = getStream(streams, streamId);
-  const {
-    name,
-    poster,
-    starts_at,
-    always_live,
-    locale,
-    iframe,
-    substreams,
-    source_tag,
-    uri_name,
-    viewers
-  } = stream;
+    // get stream by param id
+    const streamId = extractParamFromUrl(apiUrl, "id");
+    const stream = getStream(streams, streamId);
+    const {
+      name,
+      poster,
+      starts_at,
+      always_live,
+      locale,
+      iframe,
+      substreams,
+      source_tag,
+      uri_name,
+      viewers
+    } = stream;
 
-  if (!iframe && (!Array.isArray(substreams) || substreams.length === 0))
-    return JSON.stringify({
-      id: "",
-      title: "⚠️ Stream Link Not Found!",
-      posterUrl: FALLBACK_POSTER_URL,
-      backdropUrl: FALLBACK_POSTER_URL,
-      servers: []
-    });
+    if (!iframe && (!Array.isArray(substreams) || substreams.length === 0))
+      return JSON.stringify({
+        id: "",
+        title: "⚠️ Stream Link Not Found!",
+        posterUrl: FALLBACK_POSTER_URL,
+        backdropUrl: FALLBACK_POSTER_URL,
+        servers: []
+      });
 
-  const id = getSlug(apiUrl, `?id=`);
-  const viewersLabel = "Viewers: " + viewers;
-  const description = `Event "${name}" is hosted on server PPV`;
-  const streamLabel = always_live
-    ? "LIVE 24/7"
-    : Number(starts_at) <= Math.floor(Date.now() / 1000)
-      ? "LIVE"
-      : formatDateTime(starts_at);
-  episodes.push({
-    id: iframe,
-    name: `${source_tag} - ${locale.toUpperCase()}`,
-    slug: uri_name
-  });
-
-  substreams.forEach((item) => {
-    const { iframe, uri_name, locale } = item;
-    const name = `${item.source_tag} - ${locale.toUpperCase()}`;
+    const id = getQueryString(apiUrl, `?id=`);
+    const viewersLabel = "Viewers: " + viewers;
+    const description = `Event "${name}" is hosted on server PPV`;
+    const streamLabel = always_live
+      ? "LIVE 24/7"
+      : Number(starts_at) <= Math.floor(Date.now() / 1000)
+        ? "LIVE"
+        : formatDateTime(starts_at);
     episodes.push({
-      id: item.iframe,
-      name: name,
-      slug: item.uri_name
+      id: iframe,
+      name: `${source_tag} - ${locale.toUpperCase()}`,
+      slug: `${uri_name}-1`
     });
-  });
 
-  const servers = [{ name: "ADMIN", episodes: episodes }];
+    substreams.forEach((item, index) => {
+      const { iframe } = item;
+      const name = `${item.source_tag} - ${item.locale.toUpperCase()}`;
+      const path = `${item.uri_name}-${index + 2}`;
+      episodes.push({
+        id: iframe,
+        name: name,
+        slug: path
+      });
+    });
 
-  return JSON.stringify({
-    id: id,
-    title: name,
-    posterUrl: poster || FALLBACK_POSTER_URL,
-    backdropUrl: poster || FALLBACK_POSTER_URL,
-    quality: streamLabel,
-    episode_current: viewersLabel,
-    description: description,
-    lang: locale,
-    servers: servers
-  });
+    const servers = [{ name: "ADMIN", episodes: episodes }];
+
+    return JSON.stringify({
+      id: id,
+      title: name,
+      posterUrl: poster || FALLBACK_POSTER_URL,
+      backdropUrl: poster || FALLBACK_POSTER_URL,
+      quality: streamLabel,
+      episode_current: viewersLabel,
+      description: description,
+      lang: locale,
+      servers: servers
+    });
+  } catch (error) {
+    console.log("⛔ [parseMovieDetail] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
-function parseDetailResponse(html, sourceUrl) {
-  return JSON.stringify({
-    url: sourceUrl,
-    headers: {
-      Referer: sourceUrl,
-      Origin: sourceUrl,
-      "User-Agent":
-        "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-      "Sec-Ch-Ua":
-        '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-      "Sec-Ch-Ua-Mobile": "?1",
-      "Sec-Ch-Ua-Platform": '"Android"',
-      Accept: "*/*",
-      "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-      "X-Requested-With": "com.android.chrome"
-    },
-    isEmbed: true
-  });
+function parseDetailResponse(html, embedUrl) {
+  try {
+    return JSON.stringify({
+      url: embedUrl,
+      headers: {
+        Referer: embedUrl,
+        Origin: embedUrl,
+        "User-Agent":
+          "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Sec-Ch-Ua":
+          '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        "Sec-Ch-Ua-Mobile": "?1",
+        "Sec-Ch-Ua-Platform": '"Android"',
+        Accept: "*/*",
+        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+        "X-Requested-With": "com.android.chrome"
+      },
+      isEmbed: true
+    });
+  } catch (error) {
+    console.log("⛔ [parseDetailResponse] ERROR MESSAGE: ", error);
+    return "{}";
+  }
 }
 
 function parseCategoriesResponse(html) {
@@ -468,7 +479,7 @@ function filterStreams(streams, [filterKey, filterValue]) {
   return streams;
 }
 
-function getSlug(apiUrl, keyword) {
+function getQueryString(apiUrl, keyword) {
   const index = apiUrl.indexOf(keyword);
   if (!keyword || index === -1) return "";
   return apiUrl.substring(index);
