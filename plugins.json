@@ -6,21 +6,24 @@
       "name": "Streamed",
       "version": "1.3.6",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
-      "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png"
+      "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
+      "info": "MULTI-SPORTS"
     },
     {
       "id": "timstreams",
       "name": "Timstreams",
       "version": "1.2.4",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/timstreams_plugin.js",
-      "iconUrl": "https://i.ibb.co/qYJ3gnwZ/timstreams-logo.png"
+      "iconUrl": "https://i.ibb.co/qYJ3gnwZ/timstreams-logo.png",
+      "info": "SPORTS (Full HD → 4K) + IPTV"
     },
     {
       "id": "ppv",
       "name": "PPV",
       "version": "1.1.9",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
-      "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png"
+      "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
+      "info": "MULTI-SPORTS"
     }
   ]
 }
