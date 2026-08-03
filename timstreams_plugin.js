@@ -1,7 +1,3 @@
-const BASE_DOMAIN = "https://timstreams.st";
-const BASE_API_URL = "https://api.timstreams.st/api";
-const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
-
 // =============================================================================
 // NHÓM 1: CẤU HÌNH (Config & Metadata)
 // =============================================================================
@@ -10,37 +6,23 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "Timstreams",
-    version: "1.2.2",
+    version: "1.2.4",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
     isAdult: false,
     type: "MOVIE",
     layoutType: "HORIZONTAL",
-    playerType: "embedtoexoplay"
+    playerType: "embedtoexoplay",
+    debug: true
   });
 }
 
 function getHomeSections() {
   return JSON.stringify([
-    {
-      slug: "live-upcoming",
-      title: "🔴 LIVE EVENTS",
-      type: "Horizontal",
-      path: ""
-    },
-    {
-      slug: "replays",
-      title: "Latest Replays 🎞️",
-      type: "Horizontal",
-      path: ""
-    },
-    {
-      slug: "channels",
-      title: "Television 24/7 📺",
-      type: "Grid",
-      path: ""
-    }
+    { slug: "live-upcoming", title: "🔴 LIVE EVENTS", type: "Horizontal", path: "" },
+    { slug: "replays", title: "Latest Replays 🎞️", type: "Horizontal", path: "" },
+    { slug: "channels", title: "Television 24/7 📺", type: "Grid", path: "" }
   ]);
 }
 
@@ -64,8 +46,8 @@ function getUrlList(slug, filtersJson) {
   return `${BASE_API_URL}/${slug}`;
 }
 
-function getUrlSearch(keyword, filtersJson) {
-  return `${BASE_API_URL}/channels?search=${encodeURIComponent(keyword?.trim())}`;
+function getUrlSearch(keyword = "", filtersJson) {
+  return `${BASE_API_URL}/channels?search=${encodeURIComponent(keyword.trim())}`;
 }
 
 function getUrlDetail(path) {
@@ -92,51 +74,33 @@ function parseListResponse(html, apiUrl) {
   try {
     const data = JSON.parse(html);
     let streams = data?.events || data?.channels || data?.replays;
+    // API return events|channels|replays = null instead of []
+    if(!streams) return EMPTY_LIST_RESPONSE;
     const items = [];
-
-    // Lọc theo search keyword từ ?search= trong apiUrl
+    // Filter search keyword form query string ?search= 
     const keyword = extractParamFromUrl(apiUrl, "search");
+
     streams = filterStreams(streams, keyword);
-
     streams.forEach((stream) => {
-      const { url, name, logo, genre, time } = stream;
-      const description = `Event "${name}" is hosted on server Timstreams.`;
-      const streamLabel = data?.genres?.[genre] || "REPLAY";
-      const path =
-        (data?.events
-          ? "/live-upcoming"
-          : data?.channels
-            ? "/channels"
-            : "/replays") + `?slug=${url}`;
-      const tLInfo = data?.channels
-        ? "LIVE 24/7"
-        : data?.replays
-          ? "📀"
-          : isLive(time)
-            ? "LIVE"
-            : formatDateTimeGMT7(time);
-
       items.push({
-        id: path,
-        title: name,
-        description: description,
-        posterUrl: logo || FALLBACK_POSTER_URL,
-        backdropUrl: logo || FALLBACK_POSTER_URL,
-        quality: tLInfo,
-        episode_current: streamLabel
+        id: (data.events ? "/live-upcoming" : data.channels ? "/channels" : "/replays") + `?slug=${stream.url}`,
+        title: stream.name,
+        description: `Event "${stream.name}" is hosted on server Timstreams.`,
+        posterUrl: stream.logo || FALLBACK_POSTER_URL,
+        backdropUrl: stream.logo || FALLBACK_POSTER_URL,
+        quality: data.channels ? "LIVE 24/7" : data.replays ? "📀" : isLive(stream.time) ? "LIVE" : formatDateTimeGMT7(stream.time),
+        episode_current: data.genres?.[stream.genre]?.name ? `Viewers: ${stream.viewers}` : "REPLAY",
+        lang: data.genres?.[stream.genre]?.name?.toUpperCase() || ""
       });
     });
-
+    
     return JSON.stringify({
       items: items,
       pagination: { currentPage: 1, totalPages: 1 }
     });
   } catch (error) {
-    console.log("⛔ [parseListResponse] ERROR MESSAGE: ", error);
-    return JSON.stringify({
-      items: [],
-      pagination: { currentPage: 1, totalPages: 1 }
-    });
+    console.error("⛔ [parseListResponse in timstreams_plugin.js] ERROR MESSAGE: ", error);
+    return EMPTY_LIST_RESPONSE;
   }
 }
 
@@ -149,56 +113,34 @@ function parseMovieDetail(html, apiUrl) {
     const data = JSON.parse(html);
     const streams = data?.events || data?.replays || data?.channels;
 
+    if(!streams) return EMPTY_MOVIE_DETAIL;
     const slug = extractParamFromUrl(apiUrl, "slug");
-    const stream = getStream(streams, slug) || {};
+    const stream = getStream(streams, slug);
 
-    const { name, logo, genre, time } = stream;
-    const id =
-      getPath(apiUrl, `/live-upcoming`) ||
-      getPath(apiUrl, `/channels`) ||
-      getPath(apiUrl, `/replays`);
-    const type = genre && (data?.genres[genre] || data?.genres[genre]);
-    const dateTime =
-      data?.events && isLive(time) ? "LIVE" : formatDateTimeGMT7(time);
-    const description = `Event "${name}" is hosted on server Timstreams`;
+    if(!stream) return EMPTY_MOVIE_DETAIL;
     const episodes = [];
 
     stream.streams?.forEach((item, index) => {
-      let { name, url } = item;
-      if (!url)
-        return JSON.stringify({
-          id: "",
-          title: "⚠️ Stream Link Not Found!",
-          posterUrl: FALLBACK_POSTER_URL,
-          backdropUrl: FALLBACK_POSTER_URL,
-          servers: []
-        });
-
-      name = data?.events || data?.replays ? name : `${stream.name} - ${name}`;
-      const slug = `${stream.url}-${index + 1}`;
-
       episodes.push({
-        id: url,
-        name: name,
-        slug: slug
+        id: item.url,
+        name: data.events || data.replays ? item.name : `${stream.name} - ${item.name}`,
+        slug: `${stream.url}-${index + 1}`
       });
     });
 
-    const servers = [{ name: "ADMIN", episodes: episodes }];
-
     return JSON.stringify({
-      id: id,
-      title: name,
-      posterUrl: logo || FALLBACK_POSTER_URL,
-      backdropUrl: logo || FALLBACK_POSTER_URL,
-      quality: type,
-      episode_current: dateTime,
-      description: description,
-      servers: servers
+      id: getPath(apiUrl, `/live-upcoming`) || getPath(apiUrl, `/channels`) || getPath(apiUrl, `/replays`),
+      title: stream.name,
+      posterUrl: stream.logo || FALLBACK_POSTER_URL,
+      backdropUrl: stream.logo || FALLBACK_POSTER_URL,
+      quality: (stream.genre && data.genres && data.genres?.[stream.genre]?.name) || `REPLAY - ${stream.date}`,
+      episode_current: (data.events && isLive(stream.time) ? "LIVE" : formatDateTimeGMT7(stream.time)) || `Viewers: ${stream.viewers}`,
+      description: `Event "${stream.name}" is hosted on server Timstreams`,
+      servers: [{ name: "ADMIN", episodes: episodes }]
     });
   } catch (error) {
-    console.log("⛔ [parseMovieDetail] ERROR MESSAGE: ", error);
-    return "{}";
+    console.error("⛔ [parseMovieDetail in timstreams_plugin.js] ERROR MESSAGE: ", error);
+    return EMPTY_MOVIE_DETAIL;
   }
 }
 
@@ -222,7 +164,7 @@ function parseDetailResponse(html, embedUrl) {
       isEmbed: true
     });
   } catch (error) {
-    console.log("⛔ [parseDetailResponse] ERROR MESSAGE: ", error);
+    console.error("⛔ [parseDetailResponse in timstreams_plugin.js] ERROR MESSAGE: ", error);
     return "{}";
   }
 }
@@ -240,6 +182,30 @@ function parseYearsResponse(html) {
 // =============================================================================
 // NHÓM 4: HELPERS
 // =============================================================================
+
+// ======================================
+// VARIABLES
+// ======================================
+
+const BASE_DOMAIN = "https://timstreams.st";
+const BASE_API_URL = "https://api.timstreams.st/api";
+const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
+const EMPTY_MOVIE_DETAIL = JSON.stringify({
+  id: "",
+  title: "⚠️ Stream Link Not Found!",
+  posterUrl: FALLBACK_POSTER_URL,
+  backdropUrl: FALLBACK_POSTER_URL,
+  servers: []
+});
+const EMPTY_LIST_RESPONSE = JSON.stringify({
+  items: [],
+  pagination: { currentPage: 1, totalPages: 1 },
+});
+
+
+// ======================================
+// FUNCTIONS
+// ======================================
 
 // GMT-4
 const isLive = (time) => Date.now() >= new Date(time + ":00-04:00").getTime();
@@ -270,9 +236,10 @@ function getStream(streams, slug) {
 }
 
 function filterStreams(streams, keyword) {
+  // search
   if (keyword) {
     streams = streams.filter(function (stream) {
-      return stream?.name?.toLowerCase()?.indexOf(keyword.toLowerCase()) >= 0;
+      return stream.name?.toLowerCase()?.indexOf(keyword.toLowerCase()) >= 0;
     });
   }
 
