@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.3.6",
+    version: "1.3.7",
     baseUrl: "https://streamed.pk",
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -120,7 +120,6 @@ function parseListResponse(html, apiUrl) {
         items.push({
           id: `/stream/${item.source}/${item.id}|data:${encodedData}`,
           title,
-          description,
           posterUrl,
           backdropUrl: posterUrl,
           quality: Date.now() >= stream.date ? "LIVE" : formatDateTime(stream.date),

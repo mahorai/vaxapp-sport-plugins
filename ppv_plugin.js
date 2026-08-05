@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.1.9",
+    version: "1.2.0",
     baseUrl: "https://ppv.st",
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -131,7 +131,6 @@ function parseListResponse(html, apiUrl) {
             ? "LIVE"
             : formatDateTime(stream.starts_at),
         title: stream.name,
-        description: `Event "${stream.name}" is hosted on server "PPV".`,
         posterUrl: stream.poster || FALLBACK_POSTER_URL,
         backdropUrl: stream.poster || FALLBACK_POSTER_URL,
         episode_current: "Viewers: " + stream.viewers,

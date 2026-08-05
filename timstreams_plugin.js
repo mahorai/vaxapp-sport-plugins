@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "Timstreams",
-    version: "1.2.4",
+    version: "1.2.5",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -85,7 +85,6 @@ function parseListResponse(html, apiUrl) {
       items.push({
         id: (data.events ? "/live-upcoming" : data.channels ? "/channels" : "/replays") + `?slug=${stream.url}`,
         title: stream.name,
-        description: `Event "${stream.name}" is hosted on server Timstreams.`,
         posterUrl: stream.logo || FALLBACK_POSTER_URL,
         backdropUrl: stream.logo || FALLBACK_POSTER_URL,
         quality: data.channels ? "LIVE 24/7" : data.replays ? "📀" : isLive(stream.time) ? "LIVE" : formatDateTimeGMT7(stream.time),
