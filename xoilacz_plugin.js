@@ -6,14 +6,14 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: "https://xoilacz.io",
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
     isAdult: false,
     type: "MOVIE",
     layoutType: "HORIZONTAL",
-    playerType: "embed",
+    playerType: "auto",
     debug: true
   });
 }
@@ -21,11 +21,23 @@ function getManifest() {
 function getHomeSections() {
   return JSON.stringify([
     { slug: "football", title: "FOOTBALL ⚽", type: "Horizontal", path: "" },
-    { slug: "basketball", title: "BASKETBALL 🏀", type: "Horizontal", path: "" },
+    {
+      slug: "basketball",
+      title: "BASKETBALL 🏀",
+      type: "Horizontal",
+      path: ""
+    },
     { slug: "tennis", title: "TENNIS 🎾", type: "Horizontal", path: "" },
     { slug: "badminton", title: "BADMINTON 🏸", type: "Horizontal", path: "" },
-    { slug: "volleyball", title: "VOLLEYBALL 🏐", type: "Horizontal", path: "" },
-    { slug: "esports", title: "ESPORTS 🎮", type: "Horizontal", path: "" }
+    {
+      slug: "volleyball",
+      title: "VOLLEYBALL 🏐",
+      type: "Horizontal",
+      path: ""
+    },
+    { slug: "esports", title: "ESPORTS 🎮", type: "Horizontal", path: "" },
+    { slug: "highlight", title: "HIGHLIGHT 🎉", type: "Horizontal", path: "" },
+    { slug: "video", title: "REPLAY 🎞️", type: "Horizontal", path: "" }
   ]);
 }
 
@@ -36,7 +48,9 @@ function getPrimaryCategories() {
     { name: "TENNIS", slug: "tennis" },
     { name: "BADMINTON", slug: "badminton" },
     { name: "VOLLEYBALL", slug: "volleyball" },
-    { name: "ESPORTS", slug: "esports" }
+    { name: "ESPORTS", slug: "esports" },
+    { name: "HIGHLIGHT", slug: "highlight" },
+    { name: "REPLAY", slug: "video" }
   ]);
 }
 
@@ -51,8 +65,13 @@ function getFilterConfig() {
 function getUrlList(slug, filtersJson) {
   try {
     filters = JSON.parse(filtersJson || "{}");
-    const page = filters.page || 0;
-    return `${BASE_DOMAIN}/sport/${slug}/load-more/home/page/${page}/per/20`;
+    if (slug === "video" || slug === "highlight") {
+      const page = filters.page || 1;
+      return `${BASE_DOMAIN}/${slug}/page/${page}`;
+    } else {
+      const page = filters.page || 0;
+      return `${BASE_DOMAIN}/sport/${slug}/load-more/home/page/${page}/per/20`;
+    }
   } catch (error) {
     console.error(
       "⛔ [getUrlList in xoilacz_plugin.js] ERROR MESSAGE: ",
@@ -88,29 +107,59 @@ function getUrlYears() {
 
 function parseListResponse(html, apiUrl) {
   try {
-    const data = JSON.parse(html).data;
     const items = [];
+    let currentPage, totalPages, pattern;
+    let category = /sport\/([^/]+)\/load-more/i.exec(apiUrl)?.[1];
 
-    const category = /sport\/([^/]+)\/load-more/i.exec(apiUrl)?.[1];
-    if(category) { // sports category
+    if (category) {
+      // sports category
+      const data = JSON.parse(html).data;
       // <div class="grid-matches__item grid-matches__item-match....
-      const cardPattern =
-        /<div\b(?=[^>]*\bclass="[^"]*\bgrid-matches__item\b[^"]*")[^>]*>/gi;
-      const cardsHTML = getCardsHTML(data.html, cardPattern);
-  
-      cardsHTML.forEach((cardHTML) => {
-        const event = extractEvent(cardHTML, category);
+      pattern =
+        /<div\b(?=[^>]*\bclass="[^"]*\bgrid-matches__item-match\b[^"]*")[^>]*>/gi;
+      const cardsHtml = extractCardsHtml(data.html, pattern, "div");
+
+      cardsHtml.forEach((cardHtml) => {
+        const event = extractItem(cardHtml, category);
         if (event) items.push(event);
       });
-    } else { // replay and hightlight
+      currentPage = data.pagination.next_page - 1 || 0;
+      totalPages = data.pagination.total_pages || 1;
+    } else {
+      // replay and hightlight
+      let match;
+      category = /^https?:\/\/[^\/]+\/([^\/?#]+)/i.exec(apiUrl)?.[1];
+      if (category === "video")
+        pattern =
+          /<article class="video-match-card[^"]*">[\s\S]*?<\/article>/gi;
+      else if (category === "highlight")
+        pattern =
+          /<div(?=[^>]*\bclass="[^"]*\bpost-item-image\b[^"]*")[^>]*>[\s\S]*?<\/div>/gi;
+      while ((match = pattern.exec(html)) !== null) {
+        const video = extractItem(match[0], category);
+        if (video) items.push(video);
+      }
+      // solve pagination
+      // get current page
+      pattern = /\/page\/(\d+)\/?$/i;
+      match = apiUrl.match(pattern);
+      currentPage = match ? match[1] : 1;
+      // get totalPage form href from a tag class="last" and aria-label="Last Page" ,
+      pattern =
+        /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\blast\b[^"']*["'])(?=[^>]*\baria-label\s*=\s*["']Last Page["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
+      match = html.match(pattern);
+      const lastPageHref = match ? match[1] : "";
 
+      pattern = /\/page\/(\d+)\/?$/i;
+      match = lastPageHref.match(pattern);
+      totalPages = match ? match[1] : 1;
     }
 
     return JSON.stringify({
       items: items,
       pagination: {
-        currentPage: data.pagination.next_page - 1 || 0,
-        totalPages: data.pagination.total_pages || 1
+        currentPage,
+        totalPages
       }
     });
   } catch (error) {
@@ -129,56 +178,92 @@ function parseSearchResponse(html, apiUrl) {
 function parseMovieDetail(html, apiUrl) {
   try {
     const data = JSON.parse(decodeURIComponent(getPipeData(apiUrl)));
-    //get episodes name
-    const regex = /<a\b[^>]*\bid="tv_link_\d+"[^>]*>([\s\S]*?)<\/a>/gi;
-    const epsName = [...html.matchAll(regex)].map((m) =>
-      m[1]
-        .replace(/<[^>]+>/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-    );
-    //get episodes url (embed)
-    const match = /var\s+list_stream\s*=\s*(\[\[.*?\]\]);/s.exec(html);
-    const epsUrl = match ? JSON.parse(match[1].replace(/\\\//g, "/")) : [];
     var servers = [];
     const episodes = [];
+    const isEvent = apiUrl.includes("truc-tiep");
 
-    epsName.forEach((epName, index) => {
-      if (epsUrl[index].length > 0)
+    if (!isEvent) {
+      let mediaPattern =
+        /https?:\/\/[^\s"'<>]+?\.(?:m3u8|mp4)(?:\?[^"'<>]*)?/gi;
+      const mediaLinks = html.match(mediaPattern) || [];
+      if (mediaLinks.length === 0) {
+        const mediaPattern =
+          /<iframe\b(?=[^>]*\bsrc\s*=\s*["']([^"']+)["'])[^>]*>/gi;
+        let match;
+        while ((match = mediaPattern.exec(html)) !== null)
+          mediaLinks.push(match[1]);
+      }
+
+      pattern =
+        /<button\b(?=[^>]*\bid\s*=\s*["']tv_link_[^"']*["'])[^>]*>([\s\S]*?)<\/button>/gi;
+      const commentators = [...html.matchAll(pattern)].map((match) =>
+        match[1]
+          .replace(/<svg[\s\S]*?<\/svg>/gi, "")
+          .replace(/<[^>]+>/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+      );
+      const isVideo = Array.isArray(commentators) && commentators.length > 0;
+      mediaLinks.forEach((mediaLink, index) => {
         episodes.push({
-          id: `${epsUrl[index][0]}/off-tvc?is_off_add=true`,
-          name: epName,
-          slug: `${epsUrl[index][0]}/off-tvc?is_off_add=true`
+          id: mediaLink,
+          name: !isVideo
+            ? "FULL - 0" + (index + 1)
+            : "BLV " + commentators[index],
+          slug: mediaLink
         });
-    });
-    if (episodes.length > 0) {
-      servers.push({ name: "ADMIN", episodes: episodes });
-      servers.push({
-        name: "FALLBACK",
-        episodes: JSON.parse(
-          JSON.stringify(episodes).replaceAll("xlz", "xl365")
-        )
       });
+      servers.push({ name: "ADMIN", episodes: episodes });
+    } else {
+      //get episodes name
+      const regex = /<a\b[^>]*\bid="tv_link_\d+"[^>]*>([\s\S]*?)<\/a>/gi;
+      const epsName = [...html.matchAll(regex)].map((m) =>
+        m[1]
+          .replace(/<[^>]+>/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+      );
+      //get episodes url (embed)
+      const match = /var\s+list_stream\s*=\s*(\[\[.*?\]\]);/s.exec(html);
+      const epsUrl = match ? JSON.parse(match[1].replace(/\\\//g, "/")) : [];
+
+      epsName.forEach((epName, index) => {
+        if (epsUrl[index].length > 0)
+          episodes.push({
+            id: `${epsUrl[index][0]}/off-tvc?is_off_add=true`,
+            name: epName,
+            slug: `${epsUrl[index][0]}/off-tvc?is_off_add=true`
+          });
+      });
+      if (episodes.length > 0) {
+        servers.push({ name: "ADMIN", episodes: episodes });
+        servers.push({
+          name: "FALLBACK",
+          episodes: JSON.parse(
+            JSON.stringify(episodes).replaceAll("xlz", "xl365")
+          )
+        });
+      }
     }
 
     return JSON.stringify({
       id: apiUrl,
       title: data.title,
-      posterUrl: data.posterUrl || FALLBACK_POSTER_URL,
-      backdropUrl: data.posterUrl || FALLBACK_POSTER_URL,
-      quality: "HD",
-      episode_current: data.competition,
+      posterUrl: data.posterUrl || FALLBACK_POSTER_URL.football[1],
+      backdropUrl: data.posterUrl || FALLBACK_POSTER_URL.football[1],
+      quality: data.quality,
+      episode_current: data.episode_current,
       description: `Event "${data.title}" is hosted on server XOILACZ`,
       servers: servers,
-      lang: data.dateTime
+      lang: data.lang
     });
-    return EMPTY_MOVIE_DETAIL;
+    return EMPTY_ITEM_DETAIL;
   } catch (error) {
     console.error(
       "⛔ [parseMovieDetail in xoilacz_plugin.js] ERROR MESSAGE: ",
       error
     );
-    return EMPTY_MOVIE_DETAIL;
+    return EMPTY_ITEM_DETAIL;
   }
 }
 
@@ -306,11 +391,11 @@ const FALLBACK_POSTER_URL = {
     "https://i.ibb.co/R152phZ/basketball02.webp"
   ]
 };
-const EMPTY_MOVIE_DETAIL = JSON.stringify({
+const EMPTY_ITEM_DETAIL = JSON.stringify({
   id: "",
   title: "⚠️ Stream Link Not Found!",
-  posterUrl: FALLBACK_POSTER_URL,
-  backdropUrl: FALLBACK_POSTER_URL,
+  posterUrl: FALLBACK_POSTER_URL.football[1],
+  backdropUrl: FALLBACK_POSTER_URL.football[1],
   servers: []
 });
 const EMPTY_LIST_RESPONSE = JSON.stringify({
@@ -328,7 +413,8 @@ function extractParamFromUrl(url, param) {
   return match ? decodeURIComponent(match[1]) : "";
 }
 
-function getCardsHTML(htmlContent, cardPattern) {
+// Extract HTML cards blocks by pattern and handle nested tags correctly
+function extractCardsHtml(htmlContent, cardPattern, htmlTagName) {
   let results = [];
   let match;
 
@@ -338,8 +424,8 @@ function getCardsHTML(htmlContent, cardPattern) {
     let count = 1;
 
     while (count > 0) {
-      let open = htmlContent.indexOf("<div", pos);
-      let close = htmlContent.indexOf("</div>", pos);
+      let open = htmlContent.indexOf(`<${htmlTagName}`, pos);
+      let close = htmlContent.indexOf(`</${htmlTagName}>`, pos);
 
       if (close === -1) break;
       if (open !== -1 && open < close) {
@@ -357,62 +443,136 @@ function getCardsHTML(htmlContent, cardPattern) {
   return results;
 }
 
-function extractEvent(cardHTML, category) {
-  // get path and title
-  let path = null;
-  const tag = /<a\b[^>]*class="[^"]*\bredirectPopup\b[^"]*"[^>]*>/i.exec(
-    cardHTML
-  );
-  if (!tag) return null;
-  const hrefMatch = /href="([^"]+)"/i.exec(tag[0]);
-  const titleMatch = /title="([^"]+)"/i.exec(tag[0]);
-  path = hrefMatch[1];
-  title = titleMatch[1];
-  const res = parseTitle(title);
+function extractItem(cardHtml, category) {
+  let match,
+    pattern,
+    id,
+    title,
+    posterUrl,
+    quality = "",
+    episode_current = "",
+    lang = "",
+    encodedData;
 
-  // get competition
-  const match =
-    /<span\b(?=[^>]*\bclass="[^"]*\btext-ellipsis\b[^"]*")[^>]*>([\s\S]*?)<\/span>/i.exec(
-      cardHTML
-    );
-  const competition = match ? match[1].trim() : "";
-  // get dateTime
-  // const match = /<div\b(?=[^>]*\bclass="[^"]*\bgrid-match__date\b[^"]*")[^>]*>([\s\S]*?)<\/div>/i.exec(cardHTML);
-  // const dateTime = match ? match[1].trim() : "";
-  // team logos
-  // const regex =
-  //   /<img\b(?=[^>]*\bclass="[^"]*\bteam-logo-\d+\b[^"]*")[^>]*\bsrc="([^"]+)"/gi;
-  // const teamLogos = [...cardHTML.matchAll(regex)].map((match) => match[1]);
-  const posterUrl =
-    FALLBACK_POSTER_URL[category][
-      Math.floor(Math.random() * FALLBACK_POSTER_URL[category].length)
-    ];
-  const encodedData = encodeURIComponent(
+  if (category === "video") {
+    // get href from class="video-match-card__thumb"
+    pattern =
+      /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bvideo-match-card__thumb\b[^"']*["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
+    match = cardHtml.match(pattern);
+    id = match ? match[1] : "";
+
+    // get src and alt from img tag
+    pattern =
+      /<img\b(?=[^>]*\bsrc\s*=\s*["']([^"']+)["'])(?=[^>]*\balt\s*=\s*["']([^"']+)["'])[^>]*>/i;
+    match = cardHtml.match(pattern);
+    posterUrl = match ? match[1] : "";
+    title = match ? match[2] : "";
+    title = title.replace(/&amp;/g, "&").replace(/&#8211;/g, "–");
+
+    // get text from class="video-match-card__badge--type"
+    pattern =
+      /<span\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bvideo-match-card__badge--type\b[^"']*["'])[^>]*>([\s\S]*?)<\/span>/i;
+    match = cardHtml.match(pattern);
+    const badgeType = match ? match[1].replace(/<[^>]+>/g, "").trim() : "";
+
+    // get text from class="video-match-card__badge--time"
+    pattern =
+      /<span\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bvideo-match-card__badge--time\b[^"']*["'])[^>]*>([\s\S]*?)<\/span>/i;
+    match = cardHtml.match(pattern);
+    const badgeTime = match ? match[1].replace(/<[^>]+>/g, "").trim() : "";
+
+    lang = badgeType + " - " + badgeTime;
+    // get text from class="video-match-card__commentator"
+    pattern =
+      /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bvideo-match-card__commentator\b[^"']*["'])[^>]*>([\s\S]*?)<\/a>/i;
+    match = cardHtml.match(pattern);
+    episode_current =
+      "BLV " +
+      (match
+        ? match[1]
+            .replace(/<svg[\s\S]*?<\/svg>/gi, "")
+            .replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+        : "");
+
+    // get text from class="video-match-card__view"
+    pattern =
+      /<span\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bvideo-match-card__view\b[^"']*["'])[^>]*>([\s\S]*?)<\/span>/i;
+    match = cardHtml.match(pattern);
+    quality = match
+      ? match[1]
+          .replace(/<svg[\s\S]*?<\/svg>/gi, "")
+          .replace(/<[^>]+>/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+      : "";
+  } else if (category === "highlight") {
+    // get href from a tag
+    pattern = /<a\b(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
+    match = cardHtml.match(pattern);
+    id = match ? match[1] : "";
+    // get src and alt from img tag
+    pattern =
+      /<img\b(?=[^>]*\bsrc\s*=\s*["']([^"']+)["'])(?=[^>]*\balt\s*=\s*["']([^"']+)["'])[^>]*>/i;
+    match = cardHtml.match(pattern);
+    posterUrl = match ? match[1] : FALLBACK_POSTER_URL.football[1];
+    title = match ? match[2].split("|")[0].trim() : "";
+    title = title.replace(/&amp;/g, "&").replace(/&#8211;/g, "–");
+    quality = "HIGHLIGHT";
+    lang = "XEM LẠI TRẬN ĐẤU";
+    episode_current = "HD";
+  } else {
+    // get href and title
+    pattern =
+      /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bredirectPopup\b[^"']*["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])(?=[^>]*\btitle\s*=\s*["']([^"']+)["'])[^>]*>/i;
+    match = cardHtml.match(pattern);
+    id = match ? match[1] : "";
+    const data = parseTitle(match[2] || "");
+    // get competition
+    match =
+      /<span\b(?=[^>]*\bclass="[^"]*\btext-ellipsis\b[^"]*")[^>]*>([\s\S]*?)<\/span>/i.exec(
+        cardHtml
+      );
+    lang = match ? match[1].trim() : "";
+    posterUrl =
+      FALLBACK_POSTER_URL[category][
+        Math.floor(Math.random() * FALLBACK_POSTER_URL[category].length)
+      ];
+    title = data.title;
+    quality = isLive(data.dateTime) ? "LIVE" : data.dateTime;
+    episode_current = "HD";
+  }
+
+  encodedData = encodeURIComponent(
     JSON.stringify({
-      title: res.title,
-      competition,
-      dateTime: isLive(res.dateTime) ? "LIVE" : res.dateTime,
-      posterUrl
+      title,
+      lang,
+      posterUrl,
+      lang,
+      quality,
+      episode_current
     })
   );
 
   return {
-    id: `${path}|data:${encodedData}`,
-    title: res.title,
-    posterUrl: posterUrl || FALLBACK_POSTER_URL,
-    backdropUrl: posterUrl || FALLBACK_POSTER_URL,
-    quality: isLive(res.dateTime) ? "LIVE" : res.dateTime,
-    episode_current: "HD",
-    lang: competition
+    id: `${id}|data:${encodedData}`,
+    title,
+    posterUrl,
+    backdropUrl: posterUrl,
+    lang,
+    quality,
+    episode_current
   };
 }
 
 function parseTitle(title) {
+  if (!title) return {};
   const regex = /^(.*?)\s+lúc\s+(\d{2}:\d{2})\s+ngày\s+(\d{2}\/\d{2}\/\d{4})$/;
   const match = title.match(regex);
 
   if (!match) {
-    return null;
+    return {};
   }
 
   return {
