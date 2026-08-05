@@ -24,6 +24,14 @@
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
+    },
+    {
+      "id": "xoilacz",
+      "name": "XOILACZ",
+      "version": "1.0.0",
+      "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/xoilacz_plugin.js",
+      "iconUrl": "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
+      "info": "SPORTS, REPLAYS and HIGHLIGHTS"
     }
   ]
 }
