@@ -4,7 +4,7 @@
     {
       "id": "streamed",
       "name": "Streamed",
-      "version": "1.3.7",
+      "version": "1.3.8",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
       "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
