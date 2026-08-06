@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.2",
+    version: "1.0.3",
     baseUrl: "https://xoilacz.io",
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -542,7 +542,7 @@ function extractItem(cardHtml, category) {
         .trim()
     );
     episode_current =
-      episode_current.length > 0 ? `BLV: ${episode_current.join()}` : "HD";
+      episode_current.length > 0 ? `BLV ${episode_current.join()}` : "HD";
   }
 
   encodedData = encodeURIComponent(
