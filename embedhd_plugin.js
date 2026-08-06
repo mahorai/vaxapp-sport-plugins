@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.1",
+    version: "1.0.2",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -157,7 +157,7 @@ function parseMovieDetail(html, apiUrl) {
 
     channels.forEach((channel, index) => {
       episodes.push({
-        id: `/source/fetch.php?hd=${channel.id}`,
+        id: `${BASE_DOMAIN}/source/fetch.php?hd=${channel.id}`,
         name: channel.name,
         slug: `/source/fetch.php?hd=${channel.id}`
       });
