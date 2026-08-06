@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.3",
+    version: "1.0.4",
     baseUrl: "https://xoilacz.io",
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -60,7 +60,7 @@ function getUrlList(slug, filtersJson) {
       return `${BASE_DOMAIN}/${slug}/page/${page}`;
     } else {
       const page = filters.page || 0;
-      return `${BASE_DOMAIN}/sport/${slug}/load-more/home/page/${page}/per/20`;
+      return `${BASE_DOMAIN}/sport/${slug}/load-more/home/page/${page}/per/20?t=${Math.floor(Date.now() / 1000)}`;
     }
   } catch (error) {
     console.error(
