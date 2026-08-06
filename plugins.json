@@ -10,6 +10,14 @@
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
     },
     {
+      "id": "ppv",
+      "name": "PPV",
+      "version": "1.2.0",
+      "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
+      "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
+      "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
+    },
+    {
       "id": "timstreams",
       "name": "Timstreams",
       "version": "1.2.5",
@@ -18,12 +26,12 @@
       "info": "SPORTS (Full HD → 4K) + Global IPTV: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Motorsports (F1, MotoGP), TNT Sport, DAZN, CN, Sky Sports, Canal+, ESPN, FOX, ... v.v"
     },
     {
-      "id": "ppv",
-      "name": "PPV",
-      "version": "1.2.0",
-      "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
-      "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
-      "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
+      "id": "embedhd",
+      "name": "EmbedHD",
+      "version": "1.0.0",
+      "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/embedhd_plugin.js",
+      "iconUrl": "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
+      "info": "MULTI-SPORTS (HD quality with stable streaming): Football, Soccer, Tennis, Basketball, Hockey, Baseball, Fight Sports, Motorsports, and Other Sports"
     },
     {
       "id": "xoilacz",
