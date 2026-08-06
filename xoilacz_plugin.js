@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.1",
+    version: "1.0.2",
     baseUrl: "https://xoilacz.io",
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -21,20 +21,10 @@ function getManifest() {
 function getHomeSections() {
   return JSON.stringify([
     { slug: "football", title: "FOOTBALL ⚽", type: "Horizontal", path: "" },
-    {
-      slug: "basketball",
-      title: "BASKETBALL 🏀",
-      type: "Horizontal",
-      path: ""
-    },
+    { slug: "basketball", title: "BASKETBALL 🏀", type: "Horizontal", path: "" },
     { slug: "tennis", title: "TENNIS 🎾", type: "Horizontal", path: "" },
     { slug: "badminton", title: "BADMINTON 🏸", type: "Horizontal", path: "" },
-    {
-      slug: "volleyball",
-      title: "VOLLEYBALL 🏐",
-      type: "Horizontal",
-      path: ""
-    },
+    { slug: "volleyball", title: "VOLLEYBALL 🏐", type: "Horizontal", path: "" },
     { slug: "esports", title: "ESPORTS 🎮", type: "Horizontal", path: "" },
     { slug: "highlight", title: "HIGHLIGHT 🎉", type: "Horizontal", path: "" },
     { slug: "video", title: "REPLAY 🎞️", type: "Horizontal", path: "" }
@@ -523,6 +513,7 @@ function extractItem(cardHtml, category) {
     lang = "XEM LẠI TRẬN ĐẤU";
     episode_current = "HD";
   } else {
+    // event live
     // get href and title
     pattern =
       /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bredirectPopup\b[^"']*["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])(?=[^>]*\btitle\s*=\s*["']([^"']+)["'])[^>]*>/i;
@@ -541,7 +532,17 @@ function extractItem(cardHtml, category) {
       ];
     title = data.title;
     quality = isLive(data.dateTime) ? "LIVE" : data.dateTime;
-    episode_current = "HD";
+    pattern =
+      /<a\b[^>]*\bclass\s*=\s*["'][^"']*\bcommentator\b[^"']*["'][^>]*>[\s\S]*?<span\b[^>]*>([\s\S]*?)<\/span>[\s\S]*?<\/a>/gi;
+    episode_current = [...cardHtml.matchAll(pattern)].map((match) =>
+      match[1]
+        .replace(/<svg[\s\S]*?<\/svg>/gi, "")
+        .replace(/<[^>]+>/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+    episode_current =
+      episode_current.length > 0 ? `BLV: ${episode_current.join()}` : "HD";
   }
 
   encodedData = encodeURIComponent(
