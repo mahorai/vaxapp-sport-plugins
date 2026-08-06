@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -156,11 +156,10 @@ function parseMovieDetail(html, apiUrl) {
     const channels = streamList[category][id].channels || [];
 
     channels.forEach((channel, index) => {
-      const path = `/source/fetch.php?${channel.id.split(" ").join("=")}`;
       episodes.push({
-        id: path,
+        id: `/source/fetch.php?hd=${channel.id}`,
         name: channel.name,
-        slug: path
+        slug: `/source/fetch.php?hd=${channel.id}`
       });
     });
 
