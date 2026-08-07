@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.2",
+    version: "1.0.3",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -23,26 +23,26 @@ function getHomeSections() {
     { slug: "live", title: "🔴 LIVE", type: "Horizontal", path: "" },
     { slug: "soccer", title: "Soccer ⚽", type: "Horizontal", path: "" },
     { slug: "fight", title: "Fight 🥊", type: "Horizontal", path: "" },
-    { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
-    { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
-    { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
-    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
-    { slug: "hockey", title: "Hockey 🏒", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
+    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
+    { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
+    { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
+    { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
+    { slug: "hockey", title: "Hockey 🏒", type: "Horizontal", path: "" },
     { slug: "other", title: "Other 🎯", type: "Grid", path: "" }
   ]);
 }
 
 function getPrimaryCategories() {
   return JSON.stringify([
-    { name: "Fight", slug: "fight" },
     { name: "Soccer", slug: "soccer" },
-    { name: "Motor", slug: "motor" },
-    { name: "Football", slug: "football" },
-    { name: "Tennis", slug: "tennis" },
-    { name: "Basketball", slug: "basketball" },
-    { name: "Hockey", slug: "hockey" },
+    { name: "Fight", slug: "fight" },
     { name: "Baseball", slug: "baseball" },
+    { name: "Basketball", slug: "basketball" },
+    { name: "Motor", slug: "motor" },
+    { name: "Tennis", slug: "tennis" },
+    { name: "Football", slug: "football" },
+    { name: "Hockey", slug: "hockey" },
     { name: "Other", slug: "other" }
   ]);
 }
@@ -157,9 +157,9 @@ function parseMovieDetail(html, apiUrl) {
 
     channels.forEach((channel, index) => {
       episodes.push({
-        id: `${BASE_DOMAIN}/source/fetch.php?hd=${channel.id}`,
-        name: channel.name,
-        slug: `/source/fetch.php?hd=${channel.id}`
+        id: `${BASE_DOMAIN}/source/fetch.php?hd=${channel}`,
+        name: `Channel ${index + 1} - HD ${channel}`,
+        slug: `/source/fetch.php?hd=${channel}`
       });
     });
 
@@ -235,6 +235,7 @@ function parseYearsResponse(html) {
 // ======================================
 
 const BASE_DOMAIN = "https://embedhd.st";
+const API_URL = "https://embedhd.st/api-event.php";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_ITEM_DETAIL = JSON.stringify({
   id: "",
@@ -304,10 +305,11 @@ function extractItem(cardHtml) {
       /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-cat\s*=\s*"([^"]*)")[^>]*\bdata-cat\s*=\s*"([^"]*)"[^>]*>/is
     )?.[2] ?? "";
   // data-title
-  const dataTitle =
+  const dataTitle = (
     cardHtml.match(
       /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-title\s*=\s*"([^"]*)")[^>]*\bdata-title\s*=\s*"([^"]*)"[^>]*>/is
-    )?.[2] ?? "";
+    )?.[2] ?? ""
+  ).replace("-", "vs");
   // data-home-logo
   const dataHomeLogo =
     BASE_DOMAIN +
@@ -352,16 +354,14 @@ function extractItem(cardHtml) {
         /<img\b(?=[^>]*\bclass\s*=\s*"[^"]*\bleague-logo\b[^"]*")(?=[^>]*\bsrc\s*=\s*"([^"]*)")[^>]*>/i
       )?.[1] ?? ""
     ).replaceAll("&amp;", "&");
-  // ==================== channels ====================
-  // id + name của tất cả Channel
-  const channels = [
-    ...cardHtml.matchAll(
-      /<[^>]*title\s*=\s*"Channel[^"]*"[^>]*>[\s\S]*?<b[^>]*>(.*?)<\/b>[\s\S]*?<span[^>]*>(.*?)<\/span>/gis
-    )
-  ].map(([, id, name]) => ({
-    id: normalizeText(id),
-    name: normalizeText(name)
-  }));
+  // ==================== event-channels ====================
+  // text b tag in class="stream-number"
+  const channels =
+    [
+      ...cardHtml.matchAll(
+        /<([a-z][\w:-]*)\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bstream-number\b[^"']*\2)[^>]*>[\s\S]*?<b\b[^>]*>\s*([\s\S]*?)\s*<\/b>[\s\S]*?<\/\1>/gi
+      )
+    ].map((m) => normalizeText(m[3])) || [];
 
   if (!streamList[dataCat]) streamList[dataCat] = [];
 
@@ -380,7 +380,7 @@ function extractItem(cardHtml) {
 
 // const sourceOffset = { "UTC-12": -12, "UTC-11": -11, "UTC-10": -10, "UTC-9": -9, "UTC-8": -8, "UTC-7": -7, "UTC-6": -6, "UTC-5": -5, "UTC-4": -4, "UTC-3": -3, "UTC-2": -2, "UTC-1": -1, "UTC": 0, "UTC+1": 1, "UTC+2": 2, "UTC+3": 3, "UTC+4": 4, "UTC+5": 5, "UTC+6": 6, "UTC+7": 7, "UTC+8": 8, "UTC+9": 9, "UTC+10": 10, "UTC+11": 11, "UTC+12": 12, "UTC+13": 13, "UTC+14": 14 };
 // format + convert time form UTC -6 -> UTC -> UTC +7 (GMT)   -360 = 6*360, -(-sourceOffset) = +sourceOffset
-function formatGameDate(gameTime, gameDate, sourceOffset = -360) {
+function formatGameDate(gameTime, gameDate, sourceOffset = -240) {
   gameTime = gameTime.trim().toUpperCase();
   gameDate = gameDate.trim();
 
