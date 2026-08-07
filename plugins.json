@@ -20,7 +20,7 @@
     {
       "id": "timstreams",
       "name": "Timstreams",
-      "version": "1.2.6",
+      "version": "1.2.7",
       "scriptUrl": "https://raw.githubusercontent.com/nicolainani/vaxapp-sport-plugins/refs/heads/main/timstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/qYJ3gnwZ/timstreams-logo.png",
       "info": "SPORTS (Full HD → 4K) + Global IPTV: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Motorsports (F1, MotoGP), TNT Sport, DAZN, CN, Sky Sports, Canal+, ESPN, FOX, ... v.v"
