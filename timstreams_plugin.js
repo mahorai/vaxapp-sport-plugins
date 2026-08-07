@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "TimStreams",
-    version: "1.2.6",
+    version: "1.2.7",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -187,7 +187,7 @@ function parseYearsResponse(html) {
 // ======================================
 
 const BASE_DOMAIN = "https://timstreams.st";
-const BASE_API_URL = "https://api.timstreams.st/api";
+const BASE_API_URL = "https://timstreams.st/api";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_MOVIE_DETAIL = JSON.stringify({
   id: "",
