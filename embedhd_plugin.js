@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.5",
+    version: "1.0.6",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -90,7 +90,9 @@ function parseListResponse(html, apiUrl) {
       const cardsHtml = extractCardsHtml(html, pattern, "div");
       // console.log(cardsHtml)
       // extract item
-      cardsHtml.forEach((cardHtml) => { extractItem(cardHtml) });
+      cardsHtml.forEach((cardHtml) => {
+        extractItem(cardHtml);
+      });
     }
     let streams = null;
     const items = [];
@@ -107,8 +109,8 @@ function parseListResponse(html, apiUrl) {
       const encodedData = encodeURIComponent(
         JSON.stringify({
           title: stream.dataTitle,
-          posterUrl: stream.leagueLogo,
-          backdropUrl: stream.leagueLogo,
+          posterUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
+          backdropUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
           description: `Event "${stream.dataTitle}" is hosted on server EmbedHD`,
           quality: tLInfo,
           episode_current: "HD",
@@ -119,8 +121,8 @@ function parseListResponse(html, apiUrl) {
       items.push({
         id: `${BASE_DOMAIN}?category=${stream.dataCat}&id=${index}|data:${encodedData}`,
         title: stream.dataTitle,
-        posterUrl: stream.leagueLogo,
-        backdropUrl: stream.leagueLogo,
+        posterUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
+        backdropUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
         quality: tLInfo,
         episode_current: "HD",
         lang: `${stream.dataCat} - ${stream.leagueTitle}`.toUpperCase()
@@ -308,21 +310,17 @@ function extractItem(cardHtml) {
     )?.[2] ?? ""
   ).replace("-", "vs");
   // data-home-logo
-  const dataHomeLogo =
-    BASE_DOMAIN +
-    (
-      cardHtml.match(
-        /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-home-logo\s*=\s*"([^"]*)")[^>]*\bdata-home-logo\s*=\s*"([^"]*)"[^>]*>/is
-      )?.[2] ?? ""
-    ).replaceAll("&amp;", "&");
+  const dataHomeLogo = (
+    cardHtml.match(
+      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-home-logo\s*=\s*"([^"]*)")[^>]*\bdata-home-logo\s*=\s*"([^"]*)"[^>]*>/is
+    )?.[2] ?? ""
+  ).replaceAll("&amp;", "&");
   // data-away-logo
-  const dataAwayLogo =
-    BASE_DOMAIN +
-    (
-      cardHtml.match(
-        /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-away-logo\s*=\s*"([^"]*)")[^>]*\bdata-away-logo\s*=\s*"([^"]*)"[^>]*>/is
-      )?.[2] ?? ""
-    ).replaceAll("&amp;", "&");
+  const dataAwayLogo = (
+    cardHtml.match(
+      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-away-logo\s*=\s*"([^"]*)")[^>]*\bdata-away-logo\s*=\s*"([^"]*)"[^>]*>/is
+    )?.[2] ?? ""
+  ).replaceAll("&amp;", "&");
   // ==================== game-time ====================
   // time
   const gameTime = normalizeText(
@@ -344,13 +342,11 @@ function extractItem(cardHtml) {
       /<[^>]*\bclass\s*=\s*"[^"]*\bleague-cell\b[^"]*"(?=[^>]*\btitle\s*=\s*"([^"]*)")[^>]*\btitle\s*=\s*"([^"]*)"[^>]*>/i
     )?.[2] ?? "";
   // src logo giải đấu
-  const leagueLogo =
-    BASE_DOMAIN +
-    (
-      cardHtml.match(
-        /<img\b(?=[^>]*\bclass\s*=\s*"[^"]*\bleague-logo\b[^"]*")(?=[^>]*\bsrc\s*=\s*"([^"]*)")[^>]*>/i
-      )?.[1] ?? ""
-    ).replaceAll("&amp;", "&");
+  const leagueLogo = (
+    cardHtml.match(
+      /<img\b(?=[^>]*\bclass\s*=\s*"[^"]*\bleague-logo\b[^"]*")(?=[^>]*\bsrc\s*=\s*"([^"]*)")[^>]*>/i
+    )?.[1] ?? ""
+  ).replaceAll("&amp;", "&");
   // ==================== event-channels ====================
   // text b tag in class="stream-number"
   const channels =
@@ -365,12 +361,12 @@ function extractItem(cardHtml) {
   streamList[dataCat].push({
     dataCat,
     dataTitle,
-    dataHomeLogo,
-    dataAwayLogo,
+    dataHomeLogo: dataHomeLogo ? BASE_DOMAIN + dataHomeLogo : "",
+    dataAwayLogo: dataAwayLogo ? BASE_DOMAIN + dataAwayLogo : "",
     gameTime,
     gameDate,
     leagueTitle,
-    leagueLogo,
+    leagueLogo: leagueLogo ? BASE_DOMAIN + leagueLogo : "",
     channels
   });
 }

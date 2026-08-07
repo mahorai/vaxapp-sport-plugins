@@ -30,7 +30,7 @@ function getHomeSections() {
     { slug: "nhlstreams", title: "NHL Streams 🏒", type: "Horizontal", path: "" },
     { slug: "ncaab", title: "NCAAB Streams 🏀", type: "Horizontal", path: "" },
     { slug: "ncaa", title: "NCAA Streams 🏀", type: "Horizontal", path: "" },
-    { slug: "wwestreams", title: "WWE Streams 🤼", type: "Horizontal", path: "" },
+    { slug: "wwestreams", title: "WWE Streams 🤼", type: "Horizontal", path: "" }
   ]);
 }
 
@@ -46,7 +46,7 @@ function getPrimaryCategories() {
     { name: "NHL Streams", slug: "nhlstreams" },
     { name: "NCAAB Streams", slug: "ncaab" },
     { name: "NCAAB Streams", slug: "ncaa" },
-    { name: "WWE Streams", slug: "wwestreams" },
+    { name: "WWE Streams", slug: "wwestreams" }
   ]);
 }
 
