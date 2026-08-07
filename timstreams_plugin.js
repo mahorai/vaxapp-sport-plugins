@@ -5,8 +5,8 @@
 function getManifest() {
   return JSON.stringify({
     id: "timstreams",
-    name: "Timstreams",
-    version: "1.2.5",
+    name: "TimStreams",
+    version: "1.2.6",
     baseUrl: "https://timstreams.st",
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
@@ -134,7 +134,7 @@ function parseMovieDetail(html, apiUrl) {
       backdropUrl: stream.logo || FALLBACK_POSTER_URL,
       quality: (stream.genre && data.genres && data.genres?.[stream.genre]?.name) || `REPLAY - ${stream.date}`,
       episode_current: (data.events && isLive(stream.time) ? "LIVE" : formatDateTimeGMT7(stream.time)) || `Viewers: ${stream.viewers}`,
-      description: `Event "${stream.name}" is hosted on server Timstreams`,
+      description: `Event "${stream.name}" is hosted on server TimStreams`,
       servers: [{ name: "ADMIN", episodes: episodes }]
     });
   } catch (error) {

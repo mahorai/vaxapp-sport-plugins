@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.4",
+    version: "1.0.5",
     baseUrl: "https://xoilacz.io",
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -20,27 +20,27 @@ function getManifest() {
 
 function getHomeSections() {
   return JSON.stringify([
-    { slug: "football", title: "FOOTBALL ⚽", type: "Horizontal", path: "" },
-    { slug: "basketball", title: "BASKETBALL 🏀", type: "Horizontal", path: "" },
-    { slug: "tennis", title: "TENNIS 🎾", type: "Horizontal", path: "" },
-    { slug: "badminton", title: "BADMINTON 🏸", type: "Horizontal", path: "" },
-    { slug: "volleyball", title: "VOLLEYBALL 🏐", type: "Horizontal", path: "" },
-    { slug: "esports", title: "ESPORTS 🎮", type: "Horizontal", path: "" },
-    { slug: "highlight", title: "HIGHLIGHT 🎉", type: "Horizontal", path: "" },
-    { slug: "video", title: "REPLAY 🎞️", type: "Horizontal", path: "" }
+    { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
+    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
+    { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
+    { slug: "badminton", title: "Badminton 🏸", type: "Horizontal", path: "" },
+    { slug: "volleyball", title: "Volleyball 🏐", type: "Horizontal", path: "" },
+    { slug: "esports", title: "Esports 🎮", type: "Horizontal", path: "" },
+    { slug: "highlight", title: "Highlight 🎉", type: "Horizontal", path: "" },
+    { slug: "video", title: "Replay 🎞️", type: "Horizontal", path: "" }
   ]);
 }
 
 function getPrimaryCategories() {
   return JSON.stringify([
-    { name: "FOOTBALL", slug: "football" },
-    { name: "BASKETBALL", slug: "basketball" },
-    { name: "TENNIS", slug: "tennis" },
-    { name: "BADMINTON", slug: "badminton" },
-    { name: "VOLLEYBALL", slug: "volleyball" },
-    { name: "ESPORTS", slug: "esports" },
-    { name: "HIGHLIGHT", slug: "highlight" },
-    { name: "REPLAY", slug: "video" }
+    { name: "Football", slug: "football" },
+    { name: "Basketball", slug: "basketball" },
+    { name: "Tennis", slug: "tennis" },
+    { name: "Badminton", slug: "badminton" },
+    { name: "Volleyball", slug: "volleyball" },
+    { name: "Esports", slug: "esports" },
+    { name: "Highlight", slug: "highlight" },
+    { name: "Replay", slug: "video" }
   ]);
 }
 
