@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.3",
+    version: "1.0.4",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -99,9 +99,9 @@ function parseListResponse(html, apiUrl) {
     const items = [];
     const category = extractParamFromUrl(apiUrl, "category");
     const keyword = extractParamFromUrl(apiUrl, "search");
-    if (category) streams = streamList[category] || [];
-    else if (category && category === "live")
+    if (category && category === "live")
       streams = filterStreams(streamList, ["category", "live"]);
+    else if (category) streams = streamList[category] || [];
     else if (keyword) streams = filterStreams(streamList, ["search", keyword]);
 
     streams.forEach((stream, index) => {
@@ -484,7 +484,7 @@ function filterStreams(streamList, [filterKey, filterValue]) {
         const streams = streamList[category];
         streams.forEach((stream) => {
           const dateTime = formatGameDate(stream.gameTime, stream.gameDate);
-          if (isLive()) result.push(stream);
+          if (isLive(dateTime)) result.push(stream);
         });
       });
     }
