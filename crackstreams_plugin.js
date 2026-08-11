@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "crackstreams",
     name: "CrackStreams",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: "https://crackstreams.mx",
     iconUrl: "https://i.ibb.co/Mxg5183D/crackstreams-logo.png",
     isEnabled: true,
@@ -277,32 +277,49 @@ function extractParamFromUrl(url, param) {
 
 // Extract HTML cards blocks by pattern and handle nested tags correctly
 function extractCardsHtml(htmlContent, cardPattern, htmlTagName) {
-  let results = [];
-  let match;
+  var result = [];
+  var match;
+  // Standardize tag names: <DIV>, <Div>, </DIV>... → div
+  var tag = String(htmlTagName)
+    .replace(/[<>\/\s]/g, "")
+    .toLowerCase();
+  // Regex for opening and closing tags, case-insensitive.
+  var openTagRegex = new RegExp("<" + tag + "\\b[^>]*>", "gi");
+  var closeTagRegex = new RegExp("<\\/" + tag + "\\s*>", "gi");
 
   while ((match = cardPattern.exec(htmlContent)) !== null) {
-    let start = match.index;
-    let pos = start + match[0].length;
-    let count = 1;
+    var start = match.index;
+    var pos = start + match[0].length;
+    var count = 1;
 
     while (count > 0) {
-      let open = htmlContent.indexOf(`<${htmlTagName}`, pos);
-      let close = htmlContent.indexOf(`</${htmlTagName}>`, pos);
+      // Find the next opening tag
+      openTagRegex.lastIndex = pos;
+      // Find the next closing tag
+      closeTagRegex.lastIndex = pos;
+      var openMatch = openTagRegex.exec(htmlContent);
+      var closeMatch = closeTagRegex.exec(htmlContent);
+      var open = openMatch ? openMatch.index : -1;
+      var close = closeMatch ? closeMatch.index : -1;
 
-      if (close === -1) break;
+      // No more closing tags
+      if (close === -1) {
+        break;
+      }
+      // Opening tag appears before closing tag → nested
       if (open !== -1 && open < close) {
         count++;
-        pos = open + 4;
+        pos = open + openMatch[0].length;
       } else {
         count--;
-        pos = close + 6;
+        pos = close + closeMatch[0].length;
       }
     }
 
-    results.push(htmlContent.substring(start, pos));
+    result.push(htmlContent.substring(start, pos));
   }
 
-  return results;
+  return result;
 }
 
 const normalizeText = (text) =>

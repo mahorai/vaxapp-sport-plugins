@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.6",
+    version: "1.0.7",
     baseUrl: "https://embedhd.st",
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -24,7 +24,12 @@ function getHomeSections() {
     { slug: "soccer", title: "Soccer ⚽", type: "Horizontal", path: "" },
     { slug: "fight", title: "Fight 🥊", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
-    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
+    {
+      slug: "basketball",
+      title: "Basketball 🏀",
+      type: "Horizontal",
+      path: ""
+    },
     { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
     { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
     { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
@@ -86,9 +91,10 @@ function parseListResponse(html, apiUrl) {
   try {
     if (Object.keys(streamList).length === 0) {
       // get card html class event-row
-      pattern = /<div\b(?=[^>]*\bclass="[^"]*\bevent-row\b[^"]*")[^>]*>/gi;
-      const cardsHtml = extractCardsHtml(html, pattern, "div");
-      // console.log(cardsHtml)
+      pattern =
+        /<article\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bevent-card\b[^"']*["'])[^>]*>/gi;
+      const cardsHtml = extractCardsHtml(html, pattern, "article");
+      // console.log(cardsHtml[0]);
       // extract item
       cardsHtml.forEach((cardHtml) => {
         extractItem(cardHtml);
@@ -104,7 +110,7 @@ function parseListResponse(html, apiUrl) {
     else if (keyword) streams = filterStreams(streamList, ["search", keyword]);
 
     streams.forEach((stream, index) => {
-      const dateTime = formatGameDate(stream.gameTime, stream.gameDate);
+      const dateTime = formatDateTime(stream.dataStart);
       const tLInfo = isLive(dateTime) ? "LIVE" : dateTime;
       const encodedData = encodeURIComponent(
         JSON.stringify({
@@ -114,18 +120,18 @@ function parseListResponse(html, apiUrl) {
           description: `Event "${stream.dataTitle}" is hosted on server EmbedHD`,
           quality: tLInfo,
           episode_current: "HD",
-          lang: `${stream.dataCat} - ${stream.leagueTitle}`.toUpperCase()
+          lang: `${stream.dataCat} - ${stream.leagueName}`.toUpperCase()
         })
       );
 
       items.push({
-        id: `${BASE_DOMAIN}?category=${stream.dataCat}&id=${index}|data:${encodedData}`,
+        id: `${BASE_DOMAIN}?category=${stream.dataCat}&id=${streamList[stream.dataCat].findIndex((item) => item.dataTitle === stream.dataTitle)}|data:${encodedData}`,
         title: stream.dataTitle,
         posterUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
         backdropUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
         quality: tLInfo,
         episode_current: "HD",
-        lang: `${stream.dataCat} - ${stream.leagueTitle}`.toUpperCase()
+        lang: `${stream.dataCat} - ${stream.leagueName}`.toUpperCase()
       });
     });
 
@@ -173,7 +179,6 @@ function parseMovieDetail(html, apiUrl) {
       servers: [{ name: "ADMIN", episodes: episodes }],
       lang: data.lang
     });
-    return EMPTY_ITEM_DETAIL;
   } catch (error) {
     console.error(
       "⛔ [parseMovieDetail in embedhd_plugin.js] ERROR MESSAGE: ",
@@ -262,32 +267,49 @@ function extractParamFromUrl(url, param) {
 
 // Extract HTML cards blocks by pattern and handle nested tags correctly
 function extractCardsHtml(htmlContent, cardPattern, htmlTagName) {
-  let results = [];
-  let match;
+  var result = [];
+  var match;
+  // Standardize tag names: <DIV>, <Div>, </DIV>... → div
+  var tag = String(htmlTagName)
+    .replace(/[<>\/\s]/g, "")
+    .toLowerCase();
+  // Regex for opening and closing tags, case-insensitive.
+  var openTagRegex = new RegExp("<" + tag + "\\b[^>]*>", "gi");
+  var closeTagRegex = new RegExp("<\\/" + tag + "\\s*>", "gi");
 
   while ((match = cardPattern.exec(htmlContent)) !== null) {
-    let start = match.index;
-    let pos = start + match[0].length;
-    let count = 1;
+    var start = match.index;
+    var pos = start + match[0].length;
+    var count = 1;
 
     while (count > 0) {
-      let open = htmlContent.indexOf(`<${htmlTagName}`, pos);
-      let close = htmlContent.indexOf(`</${htmlTagName}>`, pos);
+      // Find the next opening tag
+      openTagRegex.lastIndex = pos;
+      // Find the next closing tag
+      closeTagRegex.lastIndex = pos;
+      var openMatch = openTagRegex.exec(htmlContent);
+      var closeMatch = closeTagRegex.exec(htmlContent);
+      var open = openMatch ? openMatch.index : -1;
+      var close = closeMatch ? closeMatch.index : -1;
 
-      if (close === -1) break;
+      // No more closing tags
+      if (close === -1) {
+        break;
+      }
+      // Opening tag appears before closing tag → nested
       if (open !== -1 && open < close) {
         count++;
-        pos = open + 4;
+        pos = open + openMatch[0].length;
       } else {
         count--;
-        pos = close + 6;
+        pos = close + closeMatch[0].length;
       }
     }
 
-    results.push(htmlContent.substring(start, pos));
+    result.push(htmlContent.substring(start, pos));
   }
 
-  return results;
+  return result;
 }
 
 const normalizeText = (text) =>
@@ -300,123 +322,79 @@ const normalizeText = (text) =>
 function extractItem(cardHtml) {
   // data-cat
   const dataCat =
-    cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-cat\s*=\s*"([^"]*)")[^>]*\bdata-cat\s*=\s*"([^"]*)"[^>]*>/is
-    )?.[2] ?? "";
+    cardHtml.match(/<article\b[^>]*\bdata-cat\s*=\s*["']([^"']*)["']/i)?.[1] ??
+    "";
   // data-title
-  const dataTitle = (
+  const dataTitle =
     cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-title\s*=\s*"([^"]*)")[^>]*\bdata-title\s*=\s*"([^"]*)"[^>]*>/is
-    )?.[2] ?? ""
-  ).replace("-", "vs");
+      /<article\b[^>]*\bdata-title\s*=\s*["']([^"']*)["']/i
+    )?.[1] ?? "";
   // data-home-logo
-  const dataHomeLogo = (
+  const dataHomeLogo =
     cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-home-logo\s*=\s*"([^"]*)")[^>]*\bdata-home-logo\s*=\s*"([^"]*)"[^>]*>/is
-    )?.[2] ?? ""
-  ).replaceAll("&amp;", "&");
+      /<article\b[^>]*\bdata-home-logo\s*=\s*["']([^"']*)["']/i
+    )?.[1] ?? "";
   // data-away-logo
-  const dataAwayLogo = (
+  const dataAwayLogo =
     cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bevent-row\b[^"]*"(?=[^>]*\bdata-away-logo\s*=\s*"([^"]*)")[^>]*\bdata-away-logo\s*=\s*"([^"]*)"[^>]*>/is
-    )?.[2] ?? ""
-  ).replaceAll("&amp;", "&");
-  // ==================== game-time ====================
-  // time
-  const gameTime = normalizeText(
+      /<article\b[^>]*\bdata-away-logo\s*=\s*["']([^"']*)["']/i
+    )?.[1] ?? "";
+  // data-start
+  const dataStart =
     cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bgame-time\b[^"]*"[^>]*>[\s\S]*?<b\b[^>]*>([\s\S]*?)<\/b>/i
+      /<article\b[^>]*\bdata-start\s*=\s*["']([^"']*)["']/i
+    )?.[1] ?? "";
+  // data-hds
+  const dataHds =
+    cardHtml.match(/<article\b[^>]*\bdata-hds\s*=\s*["']([^"']*)["']/i)?.[1] ??
+    "";
+  // img.thumb-league-logo -> src
+  const leagueLogo =
+    cardHtml.match(
+      /<img\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bthumb-league-logo\b[^"']*["'])[^>]*\bsrc\s*=\s*["']([^"']*)["']/i
+    )?.[1] ?? "";
+  // img.thumb-league-logo -> alt
+  const leagueName = normalizeText(
+    cardHtml.match(
+      /<img\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bthumb-league-logo\b[^"']*["'])[^>]*\balt\s*=\s*["']([^"']*)["']/i
     )?.[1] ?? ""
   );
-
-  // date
-  const gameDate = normalizeText(
-    cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bgame-time\b[^"]*"[^>]*>[\s\S]*?<span\b[^>]*>([\s\S]*?)<\/span>/i
-    )?.[1] ?? ""
-  );
-  // ==================== league-logo & league-title ====================
-  //league title
-  const leagueTitle =
-    cardHtml.match(
-      /<[^>]*\bclass\s*=\s*"[^"]*\bleague-cell\b[^"]*"(?=[^>]*\btitle\s*=\s*"([^"]*)")[^>]*\btitle\s*=\s*"([^"]*)"[^>]*>/i
-    )?.[2] ?? "";
-  // src logo giải đấu
-  const leagueLogo = (
-    cardHtml.match(
-      /<img\b(?=[^>]*\bclass\s*=\s*"[^"]*\bleague-logo\b[^"]*")(?=[^>]*\bsrc\s*=\s*"([^"]*)")[^>]*>/i
-    )?.[1] ?? ""
-  ).replaceAll("&amp;", "&");
-  // ==================== event-channels ====================
-  // text b tag in class="stream-number"
-  const channels =
-    [
-      ...cardHtml.matchAll(
-        /<([a-z][\w:-]*)\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bstream-number\b[^"']*\2)[^>]*>[\s\S]*?<b\b[^>]*>\s*([\s\S]*?)\s*<\/b>[\s\S]*?<\/\1>/gi
-      )
-    ].map((m) => normalizeText(m[3])) || [];
 
   if (!streamList[dataCat]) streamList[dataCat] = [];
 
   streamList[dataCat].push({
     dataCat,
-    dataTitle,
-    dataHomeLogo: dataHomeLogo ? BASE_DOMAIN + dataHomeLogo : "",
-    dataAwayLogo: dataAwayLogo ? BASE_DOMAIN + dataAwayLogo : "",
-    gameTime,
-    gameDate,
-    leagueTitle,
-    leagueLogo: leagueLogo ? BASE_DOMAIN + leagueLogo : "",
-    channels
+    dataTitle: dataTitle.replace("-", "vs"),
+    dataHomeLogo: dataHomeLogo
+      ? BASE_DOMAIN + dataHomeLogo.replaceAll("&amp;", "&")
+      : "",
+    dataAwayLogo: dataAwayLogo
+      ? BASE_DOMAIN + dataAwayLogo.replaceAll("&amp;", "&")
+      : "",
+    dataStart,
+    leagueLogo: leagueLogo
+      ? BASE_DOMAIN + leagueLogo.replaceAll("&amp;", "&")
+      : "",
+    leagueName,
+    channels: dataHds ? JSON.parse(dataHds) : []
   });
 }
 
-// const sourceOffset = { "UTC-12": -12, "UTC-11": -11, "UTC-10": -10, "UTC-9": -9, "UTC-8": -8, "UTC-7": -7, "UTC-6": -6, "UTC-5": -5, "UTC-4": -4, "UTC-3": -3, "UTC-2": -2, "UTC-1": -1, "UTC": 0, "UTC+1": 1, "UTC+2": 2, "UTC+3": 3, "UTC+4": 4, "UTC+5": 5, "UTC+6": 6, "UTC+7": 7, "UTC+8": 8, "UTC+9": 9, "UTC+10": 10, "UTC+11": 11, "UTC+12": 12, "UTC+13": 13, "UTC+14": 14 };
-// format + convert time form UTC -6 -> UTC -> UTC +7 (GMT)   -360 = 6*360, -(-sourceOffset) = +sourceOffset
-function formatGameDate(gameTime, gameDate, sourceOffset = -240) {
-  gameTime = gameTime.trim().toUpperCase();
-  gameDate = gameDate.trim();
-
-  // Convert 12h -> 24h
-  const [time, modifier] = gameTime.split(/\s+/);
-  let [hours, minutes] = time.split(":").map(Number);
-
-  if (modifier === "PM" && hours !== 12) hours += 12;
-  if (modifier === "AM" && hours === 12) hours = 0;
-
-  const months = {
-    jan: 0,
-    feb: 1,
-    mar: 2,
-    apr: 3,
-    may: 4,
-    jun: 5,
-    jul: 6,
-    aug: 7,
-    sep: 8,
-    oct: 9,
-    nov: 10,
-    dec: 11
-  };
-
-  const parts = gameDate.split(/\s+/);
-  const month = months[parts[1].slice(0, 3).toLowerCase()];
-  const day = Number(parts[2]);
-
-  const year = new Date().getFullYear();
-
-  // Convert source timezone -> UTC
-  const utc =
-    Date.UTC(year, month, day, hours, minutes) - sourceOffset * 60 * 1000;
-
-  const date = new Date(utc);
-
-  const hh = String(date.getHours()).padStart(2, "0");
-  const mm = String(date.getMinutes()).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mo = String(date.getMonth() + 1).padStart(2, "0");
-
-  return `${hh}:${mm}-${dd}/${mo}`;
+// data-countdown="1786888800"
+function formatDateTime(dataStart) {
+  var date = new Date(Number(dataStart) * 1000);
+  function pad2(n) {
+    return n < 10 ? "0" + n : String(n);
+  }
+  return (
+    pad2(date.getHours()) +
+    ":" +
+    pad2(date.getMinutes()) +
+    "-" +
+    pad2(date.getDate()) +
+    "/" +
+    pad2(date.getMonth() + 1)
+  );
 }
 
 function isLive(dateTime) {
@@ -476,7 +454,7 @@ function filterStreams(streamList, [filterKey, filterValue]) {
       Object.keys(streamList).forEach((category) => {
         const streams = streamList[category];
         streams.forEach((stream) => {
-          const dateTime = formatGameDate(stream.gameTime, stream.gameDate);
+          const dateTime = formatDateTime(stream.dataStart);
           if (isLive(dateTime)) result.push(stream);
         });
       });
