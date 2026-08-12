@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "methstreams",
     name: "MethStreams",
-    version: "1.0.1",
-    baseUrl: "https://methstreams.gs",
+    version: "1.0.2",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/2Rv6bzP/methstreams-logo.png",
     isEnabled: true,
     isAdult: false,

@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.3.8",
-    baseUrl: "https://streamed.pk",
+    version: "1.3.9",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
     isAdult: false,
@@ -228,6 +228,7 @@ function parseYearsResponse(html) {
 // ======================================
 
 const BACKUP_DOMAINS = "https://strmd.link";
+const BASE_DOMAIN = "https://streamed.pk";
 const BASE_API_URL = "https://streamed.pk/api";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_MOVIE_DETAIL = JSON.stringify({

@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.7",
-    baseUrl: "https://embedhd.st",
+    version: "1.0.8",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
     isAdult: false,

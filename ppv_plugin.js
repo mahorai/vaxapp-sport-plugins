@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.2.0",
-    baseUrl: "https://ppv.st",
+    version: "1.2.1",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
     isAdult: false,
@@ -247,6 +247,7 @@ function parseYearsResponse(html) {
 // ======================================
 
 const BACKUP_DOMAINS = "https://ppv.domains/";
+const BASE_DOMAIN = "https://ppv.st";
 const BASE_API_URL = "https://api.ppv.st/api/streams";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_MOVIE_DETAIL = JSON.stringify({

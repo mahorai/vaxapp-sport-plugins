@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "crackstreams",
     name: "CrackStreams",
-    version: "1.0.1",
-    baseUrl: "https://crackstreams.mx",
+    version: "1.0.2",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/Mxg5183D/crackstreams-logo.png",
     isEnabled: true,
     isAdult: false,

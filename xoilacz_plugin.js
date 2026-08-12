@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.5",
-    baseUrl: "https://xoilacz.io",
+    version: "1.0.6",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
     isAdult: false,
@@ -498,6 +498,7 @@ function extractItem(cardHtml, category) {
           .trim()
       : "";
   } else if (category === "highlight") {
+    // get event highlights
     // get href from a tag
     pattern = /<a\b(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
     match = cardHtml.match(pattern);
@@ -509,8 +510,8 @@ function extractItem(cardHtml, category) {
     posterUrl = match ? match[1] : FALLBACK_POSTER_URL.football[1];
     title = match ? match[2].split("|")[0].trim() : "";
     title = title.replace(/&amp;/g, "&").replace(/&#8211;/g, "–");
-    quality = "HIGHLIGHT";
-    lang = "XEM LẠI TRẬN ĐẤU";
+    quality = "HIGHLIGHTS";
+    lang = "HIGHLIGHTS TRẬN ĐẤU";
     episode_current = "HD";
   } else {
     // event live
@@ -542,7 +543,7 @@ function extractItem(cardHtml, category) {
         .trim()
     );
     episode_current =
-      episode_current.length > 0 ? `BLV ${episode_current.join()}` : "HD";
+      episode_current.length > 0 ? `BLV ${episode_current.join(", ")}` : "HD";
   }
 
   encodedData = encodeURIComponent(

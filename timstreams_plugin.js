@@ -6,8 +6,8 @@ function getManifest() {
   return JSON.stringify({
     id: "timstreams",
     name: "TimStreams",
-    version: "1.2.7",
-    baseUrl: "https://timstreams.st",
+    version: "1.2.8",
+    baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/WN9gstLN/logo.png",
     isEnabled: true,
     isAdult: false,
