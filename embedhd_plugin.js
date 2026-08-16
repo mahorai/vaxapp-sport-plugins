@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "embedhd",
     name: "EmbedHD",
-    version: "1.0.8",
+    version: "1.0.9",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
     isEnabled: true,
@@ -24,12 +24,7 @@ function getHomeSections() {
     { slug: "soccer", title: "Soccer ⚽", type: "Horizontal", path: "" },
     { slug: "fight", title: "Fight 🥊", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
-    {
-      slug: "basketball",
-      title: "Basketball 🏀",
-      type: "Horizontal",
-      path: ""
-    },
+    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
     { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
     { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
     { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
@@ -152,9 +147,9 @@ function parseSearchResponse(html, apiUrl) {
   return parseListResponse(html, apiUrl);
 }
 
-function parseMovieDetail(html, apiUrl) {
+function parseMovieDetail(html, apiUrl, datasend) {
   try {
-    const data = JSON.parse(decodeURIComponent(getPipeData(apiUrl)));
+    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
     const episodes = [];
     const category = extractParamFromUrl(apiUrl.split("|")[0], "category");
     const id = extractParamFromUrl(apiUrl.split("|")[0], "id");
@@ -348,16 +343,17 @@ function extractItem(cardHtml) {
   const dataHds =
     cardHtml.match(/<article\b[^>]*\bdata-hds\s*=\s*["']([^"']*)["']/i)?.[1] ??
     "";
-  // img.thumb-league-logo -> src
+  // get img tag
+  const leagueImg =
+    cardHtml.match(
+      /<div\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bcapture-league\b[^"']*["'])[^>]*>\s*<img\b[^>]*>/i
+    )?.[0] ?? "";
+  // src
   const leagueLogo =
-    cardHtml.match(
-      /<img\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bthumb-league-logo\b[^"']*["'])[^>]*\bsrc\s*=\s*["']([^"']*)["']/i
-    )?.[1] ?? "";
-  // img.thumb-league-logo -> alt
+    leagueImg.match(/\bsrc\s*=\s*["']([^"']*)["']/i)?.[1] ?? "";
+  //alt
   const leagueName = normalizeText(
-    cardHtml.match(
-      /<img\b(?=[^>]*\bclass\s*=\s*["'][^"']*\bthumb-league-logo\b[^"']*["'])[^>]*\balt\s*=\s*["']([^"']*)["']/i
-    )?.[1] ?? ""
+    leagueImg.match(/\balt\s*=\s*["']([^"']*)["']/i)?.[1] ?? ""
   );
 
   if (!streamList[dataCat]) streamList[dataCat] = [];
@@ -433,16 +429,12 @@ function isLive(dateTime) {
   return eventTimestamp <= Date.now();
 }
 
-function getPipeData(apiUrl) {
-  if (!apiUrl) return "";
-  const index = apiUrl.indexOf("|");
-
-  if (index < 0) return "";
-  var res = apiUrl.substring(index + 1).replace(/^\s+/, "");
+function getPipeData(datasend) {
+  if (!datasend) return "";
   // Remove the prefix "data:" if present (case-insensitive)
-  if (res.toLowerCase().indexOf("data:") === 0) return res.substring(5);
-
-  return res;
+  if (datasend.toLowerCase().indexOf("data:") === 0)
+    return datasend.substring(5);
+  return datasend;
 }
 
 function filterStreams(streamList, [filterKey, filterValue]) {

@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "crackstreams",
     name: "CrackStreams",
-    version: "1.0.2",
+    version: "1.0.3",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/Mxg5183D/crackstreams-logo.png",
     isEnabled: true,
@@ -151,7 +151,7 @@ function parseSearchResponse(html, apiUrl) {
   return parseListResponse(html, apiUrl);
 }
 
-function parseMovieDetail(html, apiUrl) {
+function parseMovieDetail(html, apiUrl, datasend) {
   try {
     // case 1:get allStreams = [{label, value}] - JS
     // const streams = (() => {
@@ -167,7 +167,7 @@ function parseMovieDetail(html, apiUrl) {
     })();
 
     if (streams.length === 0) return EMPTY_ITEM_DETAIL;
-    const data = JSON.parse(decodeURIComponent(getPipeData(apiUrl)));
+    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
     const episodes = [];
 
     streams.forEach((stream, index) => {
@@ -479,16 +479,11 @@ function isLive(dateTime) {
   return eventTimestamp <= Date.now();
 }
 
-function getPipeData(apiUrl) {
-  if (!apiUrl) return "";
-  const index = apiUrl.indexOf("|");
-
-  if (index < 0) return "";
-  var res = apiUrl.substring(index + 1).replace(/^\s+/, "");
+function getPipeData(datasend) {
+  if (!datasend) return "";
   // Remove the prefix "data:" if present (case-insensitive)
-  if (res.toLowerCase().indexOf("data:") === 0) return res.substring(5);
-
-  return res;
+  if (datasend.toLowerCase().indexOf("data:") === 0) return datasend.substring(5);
+  return datasend;
 }
 
 function filterStreams(streamList, [filterKey, filterValue]) {

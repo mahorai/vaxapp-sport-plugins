@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "streamed",
     name: "Streamed",
-    version: "1.3.9",
+    version: "1.4.0",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -147,13 +147,13 @@ function parseSearchResponse(html, apiUrl) {
   return parseListResponse(html, apiUrl);
 }
 
-function parseMovieDetail(html, apiUrl) {
+function parseMovieDetail(html, apiUrl, datasend) {
   try {
     const stream = JSON.parse(html);
 
     if (!Array.isArray(stream) || stream.length === 0) return EMPTY_MOVIE_DETAIL;
       
-    const data = JSON.parse(decodeURIComponent(getPipeData(apiUrl)));
+    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
     const episodes = [];
     const serverName = stream[0].source?.toUpperCase();
 
@@ -305,14 +305,9 @@ function getPath(apiUrl, keyword) {
   return apiUrl.substring(index);
 }
 
-function getPipeData(apiUrl) {
-    if (!apiUrl) return "";
-    const index = apiUrl.indexOf("|");
-
-    if (index < 0) return "";
-    var res = apiUrl.substring(index + 1).replace(/^\s+/, "");
-    // Remove the prefix "data:" if present (case-insensitive)
-    if (res.toLowerCase().indexOf("data:") === 0) return res.substring(5);
-    
-    return res;
+function getPipeData(datasend) {
+  if (!datasend) return "";
+  // Remove the prefix "data:" if present (case-insensitive)
+  if (datasend.toLowerCase().indexOf("data:") === 0) return datasend.substring(5);
+  return datasend;
 }
