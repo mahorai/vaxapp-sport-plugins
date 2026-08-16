@@ -120,7 +120,8 @@ function parseListResponse(html, apiUrl) {
       );
 
       items.push({
-        id: `${BASE_DOMAIN}?category=${stream.dataCat}&id=${streamList[stream.dataCat].findIndex((item) => item.dataTitle === stream.dataTitle)}|data:${encodedData}`,
+        id: `${BASE_DOMAIN}?category=${stream.dataCat}&id=${streamList[stream.dataCat].findIndex((item) => item.dataTitle === stream.dataTitle)}`,
+        datasend: encodedData,
         title: stream.dataTitle,
         posterUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
         backdropUrl: stream.leagueLogo || FALLBACK_POSTER_URL,
@@ -149,7 +150,7 @@ function parseSearchResponse(html, apiUrl) {
 
 function parseMovieDetail(html, apiUrl, datasend) {
   try {
-    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
+    const data = JSON.parse(decodeURIComponent(datasend));
     const episodes = [];
     const category = extractParamFromUrl(apiUrl.split("|")[0], "category");
     const id = extractParamFromUrl(apiUrl.split("|")[0], "id");
@@ -427,14 +428,6 @@ function isLive(dateTime) {
 
   // So sánh timestamp hiện tại (UTC)
   return eventTimestamp <= Date.now();
-}
-
-function getPipeData(datasend) {
-  if (!datasend) return "";
-  // Remove the prefix "data:" if present (case-insensitive)
-  if (datasend.toLowerCase().indexOf("data:") === 0)
-    return datasend.substring(5);
-  return datasend;
 }
 
 function filterStreams(streamList, [filterKey, filterValue]) {

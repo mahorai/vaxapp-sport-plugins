@@ -119,7 +119,8 @@ function parseListResponse(html, apiUrl) {
         const encodedData = encodeURIComponent(JSON.stringify({ title, posterUrl, category, description }));
 
         items.push({
-          id: `/stream/${item.source}/${item.id}|data:${encodedData}`,
+          id: `/stream/${item.source}/${item.id}`,
+          datasend: encodedData,
           title,
           posterUrl,
           backdropUrl: posterUrl,
@@ -153,7 +154,7 @@ function parseMovieDetail(html, apiUrl, datasend) {
 
     if (!Array.isArray(stream) || stream.length === 0) return EMPTY_MOVIE_DETAIL;
       
-    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
+    const data = JSON.parse(decodeURIComponent(datasend));
     const episodes = [];
     const serverName = stream[0].source?.toUpperCase();
 
@@ -303,11 +304,4 @@ function getPath(apiUrl, keyword) {
 
   if (!keyword || index === -1) return "";
   return apiUrl.substring(index);
-}
-
-function getPipeData(datasend) {
-  if (!datasend) return "";
-  // Remove the prefix "data:" if present (case-insensitive)
-  if (datasend.toLowerCase().indexOf("data:") === 0) return datasend.substring(5);
-  return datasend;
 }

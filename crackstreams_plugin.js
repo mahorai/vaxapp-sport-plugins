@@ -124,7 +124,8 @@ function parseListResponse(html, apiUrl) {
       );
 
       items.push({
-        id: `${BASE_DOMAIN}${stream.dataPath}|data:${encodedData}`,
+        id: `${BASE_DOMAIN}${stream.dataPath}`,
+        datasend: encodedData,
         title: stream.dataTitle,
         posterUrl: stream.dataLogo,
         backdropUrl: stream.dataLogo,
@@ -167,7 +168,7 @@ function parseMovieDetail(html, apiUrl, datasend) {
     })();
 
     if (streams.length === 0) return EMPTY_ITEM_DETAIL;
-    const data = JSON.parse(decodeURIComponent(getPipeData(datasend)));
+    const data = JSON.parse(decodeURIComponent(datasend));
     const episodes = [];
 
     streams.forEach((stream, index) => {
@@ -477,13 +478,6 @@ function isLive(dateTime) {
 
   // So sánh timestamp hiện tại (UTC)
   return eventTimestamp <= Date.now();
-}
-
-function getPipeData(datasend) {
-  if (!datasend) return "";
-  // Remove the prefix "data:" if present (case-insensitive)
-  if (datasend.toLowerCase().indexOf("data:") === 0) return datasend.substring(5);
-  return datasend;
 }
 
 function filterStreams(streamList, [filterKey, filterValue]) {
