@@ -4,11 +4,11 @@
 
 function getManifest() {
   return JSON.stringify({
-    id: "xoilacz",
-    name: "XOILACZ",
-    version: "1.0.7",
+    id: "xoilac365",
+    name: "XOILAC365",
+    version: "1.0.0",
     baseUrl: BASE_DOMAIN,
-    iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
+    iconUrl: "https://i.ibb.co/dwWmVjh0/xoilac365-logo.png",
     isEnabled: true,
     isAdult: false,
     type: "MOVIE",
@@ -26,7 +26,7 @@ function getHomeSections() {
     { slug: "badminton", title: "Badminton 🏸", type: "Horizontal", path: "" },
     { slug: "volleyball", title: "Volleyball 🏐", type: "Horizontal", path: "" },
     { slug: "esports", title: "Esports 🎮", type: "Horizontal", path: "" },
-    { slug: "highlight", title: "Highlight 🎉", type: "Horizontal", path: "" },
+    { slug: "xem-lai-bong-da", title: "Highlight 🎉", type: "Horizontal", path: "" },
     { slug: "video", title: "Replay 🎞️", type: "Horizontal", path: "" }
   ]);
 }
@@ -39,7 +39,7 @@ function getPrimaryCategories() {
     { name: "Badminton", slug: "badminton" },
     { name: "Volleyball", slug: "volleyball" },
     { name: "Esports", slug: "esports" },
-    { name: "Highlight", slug: "highlight" },
+    { name: "Highlight", slug: "xem-lai-bong-da" },
     { name: "Replay", slug: "video" }
   ]);
 }
@@ -51,11 +51,11 @@ function getFilterConfig() {
 // =============================================================================
 // NHÓM 2: SINH URL (App gọi hàm → nhận URL → tự fetch HTTP)
 // =============================================================================
-// https://xoilacz.io/sport/{slug}/load-more/home/page/{page}/per/20
+// https://xoilacxtr.tv/sport/{slug}/load-more/home/page/{page}/per/20
 function getUrlList(slug, filtersJson) {
   try {
     filters = JSON.parse(filtersJson || "{}");
-    if (slug === "video" || slug === "highlight") {
+    if (slug === "video" || slug === "xem-lai-bong-da") {
       const page = filters.page || 1;
       return `${BASE_DOMAIN}/${slug}/page/${page}`;
     } else {
@@ -64,7 +64,7 @@ function getUrlList(slug, filtersJson) {
     }
   } catch (error) {
     console.error(
-      "⛔ [getUrlList in xoilacz_plugin.js] ERROR MESSAGE: ",
+      "⛔ [getUrlList in xoilac365_plugin.js] ERROR MESSAGE: ",
       error
     );
     return BASE_DOMAIN;
@@ -104,9 +104,9 @@ function parseListResponse(html, apiUrl) {
     if (category) {
       // sports category
       const data = JSON.parse(html).data;
-      // <div class="grid-matches__item grid-matches__item-match....
+      // <div class="... grid-matches__item ....
       pattern =
-        /<div\b(?=[^>]*\bclass="[^"]*\bgrid-matches__item-match\b[^"]*")[^>]*>/gi;
+        /<div\b(?=[^>]*\bclass="[^"]*\bgrid-matches__item\b[^"]*")[^>]*>/gi;
       const cardsHtml = extractCardsHtml(data.html, pattern, "div");
 
       cardsHtml.forEach((cardHtml) => {
@@ -122,9 +122,9 @@ function parseListResponse(html, apiUrl) {
       if (category === "video")
         pattern =
           /<article class="video-match-card[^"]*">[\s\S]*?<\/article>/gi;
-      else if (category === "highlight")
+      else if (category === "xem-lai-bong-da")
         pattern =
-          /<div(?=[^>]*\bclass="[^"]*\bpost-item-image\b[^"]*")[^>]*>[\s\S]*?<\/div>/gi;
+          /<div(?=[^>]*\bclass="[^"]*\bpost-item\b[^"]*")[^>]*>[\s\S]*?<\/div>/gi;
       while ((match = pattern.exec(html)) !== null) {
         const video = extractItem(match[0], category);
         if (video) items.push(video);
@@ -136,7 +136,7 @@ function parseListResponse(html, apiUrl) {
       currentPage = match ? match[1] : 1;
       // get totalPage form href from a tag class="last" and aria-label="Last Page" ,
       pattern =
-        /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\blast\b[^"']*["'])(?=[^>]*\baria-label\s*=\s*["']Last Page["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
+        /<a\b(?=[^>]*\bclass\s*=\s*["'][^"']*\blast\b[^"']*["'])(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
       match = html.match(pattern);
       const lastPageHref = match ? match[1] : "";
 
@@ -154,7 +154,7 @@ function parseListResponse(html, apiUrl) {
     });
   } catch (error) {
     console.error(
-      "⛔ [parseListResponse in xoilacz_plugin.js] ERROR MESSAGE: ",
+      "⛔ [parseListResponse in xoilac365_plugin.js] ERROR MESSAGE: ",
       error
     );
     return EMPTY_LIST_RESPONSE;
@@ -227,15 +227,19 @@ function parseMovieDetail(html, apiUrl, datasend) {
       });
       if (episodes.length > 0) {
         servers.push({ name: "ADMIN", episodes: episodes });
+        // fallback 01
         servers.push({
           name: "FALLBACK 01",
           episodes: JSON.parse(
-            JSON.stringify(episodes).replaceAll("xlz", "xl365")
+            JSON.stringify(episodes).replaceAll("xl365", "xlz")
           )
         });
+        // fallback 02
         servers.push({
           name: "FALLBACK 02",
-          episodes: JSON.parse(JSON.stringify(episodes).replaceAll("xlz", "xl"))
+          episodes: JSON.parse(
+            JSON.stringify(episodes).replaceAll("xl365", "xl")
+          )
         });
       }
     }
@@ -247,14 +251,14 @@ function parseMovieDetail(html, apiUrl, datasend) {
       backdropUrl: data.posterUrl || FALLBACK_POSTER_URL,
       quality: data.quality,
       episode_current: data.episode_current,
-      description: `Event "${data.title}" is hosted on server XOILACZ`,
+      description: `Event "${data.title}" is hosted on server XOILAC365`,
       servers: servers,
       lang: data.lang
     });
     return EMPTY_ITEM_DETAIL;
   } catch (error) {
     console.error(
-      "⛔ [parseMovieDetail in xoilacz_plugin.js] ERROR MESSAGE: ",
+      "⛔ [parseMovieDetail in xoilac365_plugin.js] ERROR MESSAGE: ",
       error
     );
     return EMPTY_ITEM_DETAIL;
@@ -263,7 +267,7 @@ function parseMovieDetail(html, apiUrl, datasend) {
 
 function parseDetailResponse(html, embedUrl) {
   console.log(
-    "✅ [parseDetailResponse in xoilacz_plugin.js] embed url: ",
+    "✅ [parseDetailResponse in xoilac365_plugin.js] embed url: ",
     embedUrl
   );
   try {
@@ -286,7 +290,7 @@ function parseDetailResponse(html, embedUrl) {
     });
   } catch (error) {
     console.error(
-      "⛔ [parseDetailResponse in xoilacz_plugin.js] ERROR MESSAGE: ",
+      "⛔ [parseDetailResponse in xoilac365_plugin.js] ERROR MESSAGE: ",
       error
     );
     return "{}";
@@ -311,7 +315,7 @@ function parseYearsResponse(html) {
 // VARIABLES
 // ======================================
 
-const BASE_DOMAIN = "https://xoilacz.io";
+const BASE_DOMAIN = "https://xoilacxtr.tv";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_ITEM_DETAIL = JSON.stringify({
   id: "",
@@ -429,7 +433,7 @@ function extractItem(cardHtml, category) {
           .replace(/\s+/g, " ")
           .trim()
       : "";
-  } else if (category === "highlight") {
+  } else if (category === "xem-lai-bong-da") {
     // get event highlights
     // get href from a tag
     pattern = /<a\b(?=[^>]*\bhref\s*=\s*["']([^"']+)["'])[^>]*>/i;
