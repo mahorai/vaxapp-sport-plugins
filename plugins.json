@@ -4,7 +4,7 @@
     {
       "id": "streamed",
       "name": "Streamed",
-      "version": "1.3.9",
+      "version": "1.4.0",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
       "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
@@ -28,7 +28,7 @@
     {
       "id": "embedhd",
       "name": "EmbedHD",
-      "version": "1.0.8",
+      "version": "1.0.9",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/embedhd_plugin.js",
       "iconUrl": "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
       "info": "MULTI-SPORTS (HD quality with stable streaming): Football, Soccer, Tennis, Basketball, Hockey, Baseball, Fight Sports, Motorsports, and Other Sports"
@@ -36,7 +36,7 @@
      {
       "id": "methstreams",
       "name": "MethStreams",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/methstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/2Rv6bzP/methstreams-logo.png",
       "info": "MULTI-SPORTS: NFL, NBA, MLB, WNBA, MMA, Boxing, F1, CFB, NHL, NCAAB, WWE, TNA, AEW"
@@ -44,7 +44,7 @@
      {
       "id": "crackstreams",
       "name": "CrackStreams",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/crackstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/Mxg5183D/crackstreams-logo.png",
       "info": "MULTI-SPORTS: NFL, NBA, MLB, WNBA, MMA, Boxing, F1, CFB, NHL, NCAAB, NCAA, WWE"
