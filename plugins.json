@@ -12,7 +12,7 @@
     {
       "id": "ppv",
       "name": "PPV",
-      "version": "1.2.1",
+      "version": "1.2.2",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
