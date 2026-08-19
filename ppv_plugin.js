@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "PPV",
-    version: "1.2.1",
+    version: "1.2.2",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -33,6 +33,7 @@ function getHomeSections() {
     { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
     { slug: "hockey", title: "Hockey 🏒", type: "Horizontal", path: "" },
+    { slug: "cricket", title: "Cricket 🏏", type: "Horizontal", path: "" },
     { slug: "american-football", title: "American Football 🏈", type: "Horizontal", path: "" },
     { slug: "australian-football", title: "Australian Football 🏈", type: "Horizontal", path: "" },
     { slug: "rugby", title: "Rugby 🏉", type: "Horizontal", path: "" },
@@ -57,6 +58,7 @@ function getPrimaryCategories() {
     { name: "Basketball", slug: "basketball" },
     { name: "Baseball", slug: "baseball" },
     { name: "Hockey", slug: "hockey" },
+    { name: "Cricket", slug: "cricket" },
     { name: "American Football", slug: "american-football" },
     { name: "Australian Football", slug: "australian-football" },
     { name: "Rugby", slug: "rugby" },
@@ -121,7 +123,7 @@ function parseListResponse(html, apiUrl) {
           encodeURIComponent(stream.id) +
           "&category=" +
           encodeURIComponent(
-            Object.keys(CATEGORY_MAP).find(
+             category === "live" ? "live" : Object.keys(CATEGORY_MAP).find(
               (key) => CATEGORY_MAP[key] === stream.category_name
             )
           ),
@@ -277,7 +279,8 @@ const CATEGORY_MAP = {
   darts: "Darts",
   miscellaneous: "Miscellaneous",
   channels: "24/7 Streams",
-  "arm-wrestling": "Arm Wrestling"
+  "arm-wrestling": "Arm Wrestling",
+  "cricket": "Cricket"
   // ,: ""
 };
 
