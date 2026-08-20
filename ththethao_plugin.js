@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ththethao",
     name: "THTheThao",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/cSrQ5y7K/ththethao-logo.png",
     isEnabled: true,
@@ -149,13 +149,13 @@ function parseDetailResponse(html, apiUrl) {
       if (url.includes(".flv")) {
       // FLV (flv)
       console.log(
-        `ℹ️ [parseDetailResponse in ththethao_plugin.js] Manifest type DASH (MPD) - No DRM`
+        `ℹ️ [parseDetailResponse in ththethao_plugin.js] Manifest type FLV`
       );
       console.log("ℹ️ [parseDetailResponse in ththethao_plugin.js] URL:", url);
       return JSON.stringify({
        isEmbed: false,
         url: url,
-        mimeType: "application/x-mpegURL",
+        mimeType: "video/x-flv",
         headers: {
           "User-Agent": userAgent || "Dalvik/2.1.0",
           Referer: referrer || url,
