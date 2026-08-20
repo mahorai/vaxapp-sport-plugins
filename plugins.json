@@ -68,7 +68,7 @@
     {
       "id": "ththethao",
       "name": "THTheThao",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/ththethao_plugin.js",
       "iconUrl": "https://i.ibb.co/cSrQ5y7K/ththethao-logo.png",
       "info": "VIETNAMESE SPORTS HUB"
@@ -76,7 +76,7 @@
     {
       "id": "tinhlagisports",
       "name": "TinhLaGiSports",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/tinhlagisports_plugin.js",
       "iconUrl": "https://i.ibb.co/FPQzZM1/tinhlagi-logo.jpg",
       "info": "VIETNAMESE SPORTS HUB"
