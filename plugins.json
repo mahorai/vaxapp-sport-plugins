@@ -52,7 +52,7 @@
     {
       "id": "xoilacz",
       "name": "XOILACZ",
-      "version": "1.0.6",
+      "version": "1.0.8",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/xoilacz_plugin.js",
       "iconUrl": "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
       "info": "SPORTS, REPLAYS and HIGHLIGHTS"
@@ -60,7 +60,7 @@
     {
       "id": "xoilac365",
       "name": "XOILAC365",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/xoilac365_plugin.js",
       "iconUrl": "https://i.ibb.co/dwWmVjh0/xoilac365-logo.png",
       "info": "SPORTS, REPLAYS and HIGHLIGHTS (XOILACZ Backup)"
