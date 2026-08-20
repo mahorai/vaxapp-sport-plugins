@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
     name: "XOILACZ",
-    version: "1.0.7",
+    version: "1.0.8",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -218,11 +218,12 @@ function parseMovieDetail(html, apiUrl, datasend) {
       const epsUrl = match ? JSON.parse(match[1].replace(/\\\//g, "/")) : [];
 
       epsName.forEach((epName, index) => {
+        const domain = apiUrl.split("/").slice(0, 3).join("/");
         if (epsUrl[index].length > 0)
           episodes.push({
-            id: `${epsUrl[index][0]}/off-tvc?is_off_add=true`,
+            id: `${epsUrl[index][0]}/off-tvc?is_off_add=true|Referer=${domain}`,
             name: epName,
-            slug: `${epsUrl[index][0]}/off-tvc?is_off_add=true`
+            slug: `${epsUrl[index][0]}/off-tvc?is_off_add=true|Referer=${domain}`
           });
       });
       if (episodes.length > 0) {
@@ -262,28 +263,58 @@ function parseMovieDetail(html, apiUrl, datasend) {
 }
 
 function parseDetailResponse(html, embedUrl) {
-  console.log(
-    "✅ [parseDetailResponse in xoilacz_plugin.js] embed url: ",
-    embedUrl
-  );
   try {
-    return JSON.stringify({
-      isEmbed: false,
-      url: embedUrl,
-      headers: {
-        Referer: embedUrl,
-        Origin: embedUrl,
-        "User-Agent":
-          "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-        "Sec-Ch-Ua":
-          '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-        "Sec-Ch-Ua-Mobile": "?1",
-        "Sec-Ch-Ua-Platform": '"Android"',
-        Accept: "*/*",
-        "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-        "X-Requested-With": "com.android.chrome"
-      }
-    });
+    const urlStream = html.match(
+      /(?:var|let|const)\s+urlStream\s*=\s*["']([^"']+)["']/
+    )?.[1];
+    if (urlStream) {
+      console.log(
+        "✅ [parseDetailResponse in xoilacz_plugin.js] url: ",
+        urlStream
+      );
+      return JSON.stringify({
+        isEmbed: false,
+        url: urlStream,
+        mimeType: urlStream.includes(".m3u8")
+          ? "application/x-mpegURL"
+          : "video/x-flv",
+        headers: {
+          Referer: urlStream,
+          Origin: urlStream,
+          "User-Agent":
+            "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+          "Sec-Ch-Ua":
+            '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          "Sec-Ch-Ua-Mobile": "?1",
+          "Sec-Ch-Ua-Platform": '"Android"',
+          Accept: "*/*",
+          "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+          "X-Requested-With": "com.android.chrome"
+        }
+      });
+    } else {
+      console.log(
+        "✅ [parseDetailResponse in xoilacz_plugin.js] embed url: ",
+        embedUrl
+      );
+      return JSON.stringify({
+        isEmbed: true,
+        url: embedUrl,
+        headers: {
+          Referer: embedUrl,
+          Origin: embedUrl,
+          "User-Agent":
+            "Mozilla/5.0 (Linux; Android 10; SM-G975F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+          "Sec-Ch-Ua":
+            '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          "Sec-Ch-Ua-Mobile": "?1",
+          "Sec-Ch-Ua-Platform": '"Android"',
+          Accept: "*/*",
+          "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
+          "X-Requested-With": "com.android.chrome"
+        }
+      });
+    }
   } catch (error) {
     console.error(
       "⛔ [parseDetailResponse in xoilacz_plugin.js] ERROR MESSAGE: ",
