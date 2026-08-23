@@ -26,6 +26,14 @@
       "info": "SPORTS (Full HD → 4K) + Global IPTV: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Motorsports (F1, MotoGP), TNT Sport, DAZN, CN, Sky Sports, Canal+, ESPN, FOX, ... v.v"
     },
     {
+      "id": "streamfree",
+      "name": "StreamFree",
+      "version": "1.0.0",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/streamfree_plugin.js",
+      "iconUrl": "https://i.ibb.co/YBbwG64c/streamfree-logo.png",
+      "info": "SPORTS (Full HD → 4K) Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Motorsports (F1, MotoGP), Tennis (ATP, WTA) ... v.v"
+    },
+    {
       "id": "embedhd",
       "name": "EmbedHD",
       "version": "1.0.9",
