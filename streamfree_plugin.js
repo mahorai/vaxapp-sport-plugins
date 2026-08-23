@@ -147,7 +147,7 @@ function parseMovieDetail(html, apiUrl, datasend) {
     streams.forEach((stream, index) => {
       episodes.push({
         id: stream.url,
-        name: `Link ${index} - ${stream.name.split("•")[1].trim()}`,
+        name: `Link ${index + 1} - ${stream.name.split("•")[1].trim()}`,
         slug: stream.url
       });
     });
