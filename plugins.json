@@ -64,6 +64,14 @@
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/xoilac365_plugin.js",
       "iconUrl": "https://i.ibb.co/dwWmVjh0/xoilac365-logo.png",
       "info": "SPORTS, REPLAYS and HIGHLIGHTS (XOILACZ Backup)"
+    },
+    {
+      "id": "ththethao",
+      "name": "[SPORT] THTheThao",
+      "version": "1.0.2",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/ththethao_plugin.js",
+      "iconUrl": "https://i.ibb.co/cSrQ5y7K/ththethao-logo.png",
+      "info": "VIETNAMESE SPORTS HUB"
     }
   ]
 }
