@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ththethao",
     name: "[SPORT] THTheThao",
-    version: "1.0.1",
+    version: "1.0.2",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/cSrQ5y7K/ththethao-logo.png",
     isEnabled: true,
