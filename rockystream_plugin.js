@@ -24,26 +24,11 @@ function getHomeSections() {
     { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
     { slug: "fight", title: "Fight 🥊", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
-    {
-      slug: "basketball",
-      title: "Basketball 🏀",
-      type: "Horizontal",
-      path: ""
-    },
+    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
     { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
     { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
-    {
-      slug: "american-football",
-      title: "American Football 🏈",
-      type: "Horizontal",
-      path: ""
-    },
-    {
-      slug: "australian-football",
-      title: "Australian Football 🏈",
-      type: "Horizontal",
-      path: ""
-    },
+    { slug: "american-football", title: "American Football 🏈", type: "Horizontal", path: "" },
+    { slug: "australian-football", title: "Australian Football 🏈", type: "Horizontal", path: "" },
     { slug: "hockey", title: "Hockey 🏒", type: "Horizontal", path: "" },
     { slug: "other", title: "Other 🎯", type: "Grid", path: "" }
   ]);
@@ -124,7 +109,7 @@ function parseListResponse(html, apiUrl) {
         title: stream.title,
         posterUrl: FALLBACK_POSTER_URL,
         backdropUrl: FALLBACK_POSTER_URL,
-        episode_current: capitalize(stream.league),
+        episode_current: formatName(stream.league),
         lang: `${stream.category.toUpperCase()}`
       });
     });
@@ -134,7 +119,10 @@ function parseListResponse(html, apiUrl) {
       pagination: { currentPage: 1, totalPages: 1 }
     });
   } catch (error) {
-    console.error("⛔ [parseListResponse in rockystream_plugin.js] ERROR MESSAGE: ", error);
+    console.error(
+      "⛔ [parseListResponse in rockystream_plugin.js] ERROR MESSAGE: ",
+      error
+    );
     return JSON.stringify({
       items: [],
       pagination: { currentPage: 1, totalPages: 1 }
@@ -170,7 +158,7 @@ function parseMovieDetail(html, apiUrl) {
       title: stream.title,
       posterUrl: FALLBACK_POSTER_URL,
       backdropUrl: FALLBACK_POSTER_URL,
-      episode_current: capitalize(stream.league),
+      episode_current: formatName(stream.league),
       description: `Event "${stream.title}" is hosted on server RockyStream`,
       lang: stream.category,
       servers: [{ name: "ADMIN", episodes: episodes }],
@@ -180,7 +168,10 @@ function parseMovieDetail(html, apiUrl) {
           : formatDateTime(stream.ts_et)
     });
   } catch (error) {
-    console.error("⛔ [parseMovieDetail in rockystream_plugin.js] ERROR MESSAGE: ", error);
+    console.error(
+      "⛔ [parseMovieDetail in rockystream_plugin.js] ERROR MESSAGE: ",
+      error
+    );
     return EMPTY_MOVIE_DETAIL;
   }
 }
@@ -205,7 +196,10 @@ function parseDetailResponse(html, embedUrl) {
       isEmbed: true
     });
   } catch (error) {
-    console.error("⛔ [parseDetailResponse in rockystream_plugin.js] ERROR MESSAGE: ", error);
+    console.error(
+      "⛔ [parseDetailResponse in rockystream_plugin.js] ERROR MESSAGE: ",
+      error
+    );
     return "{}";
   }
 }
@@ -243,11 +237,13 @@ const EMPTY_MOVIE_DETAIL = JSON.stringify({
 // FUNCTIONS
 // ======================================
 
-function capitalize(str) {
-  // Handle if the string is empty or undefined
+function formatName(str) {
   if (!str) return "";
-  return str
-    .split(" ")
+  const words = str.trim().split(/\s+/);
+
+  if (words.length === 1) return words[0].toUpperCase();
+
+  return words
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 }
