@@ -5,7 +5,7 @@
 function getManifest() {
   return JSON.stringify({
     id: "ththethao",
-    name: "THTheThao",
+    name: "[SPORT] THTheThao",
     version: "1.0.1",
     baseUrl: BASE_URL,
     iconUrl: "https://i.ibb.co/cSrQ5y7K/ththethao-logo.png",
@@ -30,6 +30,13 @@ function getHomeSections() {
     { slug: "socolive-tv", title: "Socolive TV", type: "Horizontal", path: "" },
     { slug: "bia-om-tv", title: "Bia Ôm TV", type: "Horizontal", path: "" },
     { slug: "sp-tv-china", title: "SP TV (China)", type: "Horizontal", path: "" },
+    { slug: "khan-dai-tv", title: "Khán Đài TV", type: "Horizontal", path: "" },
+    { slug: "s8-tv", title: "S8 TV", type: "Horizontal", path: "" },
+    { slug: "sao-ke-tv", title: "Sao Kê TV", type: "Horizontal", path: "" },
+    { slug: "ga-vang-33-tv", title: "Gà Vàng 33 TV", type: "Horizontal", path: "" },
+    { slug: "sut-bong-tv", title: "Sút Bóng TV", type: "Horizontal", path: "" },
+    { slug: "ga-vang-tv", title: "Gà Vàng TV", type: "Horizontal", path: "" },
+    { slug: "pha-lang-tv", title: "Phá Làng TV", type: "Horizontal", path: "" }
   ]);
 }
 
@@ -45,6 +52,13 @@ function getPrimaryCategories() {
     { name: "Socolive TV", slug: "socolive-tv" },
     { name: "Bia Ôm TV", slug: "bia-om-tv" },
     { name: "SP TV (China)", slug: "sp-tv-china" },
+    { name: "Khán Đài TV", slug: "khan-dai-tv" },
+    { name: "S8 TV", slug: "s8-tv" },
+    { name: "Sao Kê TV", slug: "sao-ke-tv" },
+    { name: "Gà Vàng 33 TV", slug: "ga-vang-33-tv" },
+    { name: "Sút Bóng TV", slug: "sut-bong-tv" },
+    { name: "Gà Vàng TV", slug: "ga-vang-tv" },
+    { name: "Phá Làng TV", slug: "pha-lang-tv" }
   ]);
 }
 
@@ -206,7 +220,7 @@ function parseYearsResponse(html) {
 // VARIABLES
 // ======================================
 
-const BASE_URL = "https://thcoban.github.io/ththethao/ttthethao.m3u";
+const BASE_URL = "https://thcoban.github.io/thtt/tttt.m3u";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 let channelList = [];
 // Use GROUP_MAP to rename and merge the channel into tvg-group.
@@ -221,6 +235,13 @@ const GROUP_MAP = {
   "socolive tv": "Socolive TV",
   "bia ôm tv": "Bia Ôm TV",
   "sp tv (china)": "SP TV (China)",
+  "khán đài tv": "Khán Đài TV",
+  "s8 tv": "S8 TV",
+  "sao kê tv": "Sao Kê TV",
+  "gà vàng 33 tv": "Gà Vàng 33 TV",
+  "sút bóng tv": "Sút Bóng TV",
+  "gà vàng tv": "Gà Vàng TV",
+  "phá làng tv": "Phá Làng TV"
 };
 
 // Use CATEGORY_MAP to convert the slug to tvg-group.
@@ -235,6 +256,13 @@ const CATEGORY_MAP = {
   "socolive-tv": "Socolive TV",
   "bia-om-tv": "Bia Ôm TV",
   "sp-tv-china": "SP TV (China)",
+  "khan-dai-tv": "Khán Đài TV",
+  "s8-tv": "S8 TV",
+  "sao-ke-tv": "Sao Kê TV",
+  "ga-vang-33-tv": "Gà Vàng 33 TV",
+  "sut-bong-tv": "Sút Bóng TV",
+  "ga-vang-tv": "Gà Vàng TV",
+  "pha-lang-tv": "Phá Làng TV"
 };
 
 // ======================================
