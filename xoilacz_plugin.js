@@ -5,8 +5,8 @@
 function getManifest() {
   return JSON.stringify({
     id: "xoilacz",
-    name: "XOILACZ",
-    version: "1.0.8",
+    name: "[SPORT] XOILACZ",
+    version: "1.0.9",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
     isEnabled: true,
@@ -228,16 +228,18 @@ function parseMovieDetail(html, apiUrl, datasend) {
       });
       if (episodes.length > 0) {
         servers.push({ name: "ADMIN", episodes: episodes });
+        // fallback 01
         servers.push({
           name: "FALLBACK 01",
           episodes: JSON.parse(
             JSON.stringify(episodes).replaceAll("xlz", "xl365")
           )
         });
-        servers.push({
-          name: "FALLBACK 02",
-          episodes: JSON.parse(JSON.stringify(episodes).replaceAll("xlz", "xl"))
-        });
+        // fallback 02
+        // servers.push({
+        //   name: "FALLBACK 02",
+        //   episodes: JSON.parse(JSON.stringify(episodes).replaceAll("xlz", "xl"))
+        // });
       }
     }
 

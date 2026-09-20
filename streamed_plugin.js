@@ -5,8 +5,8 @@
 function getManifest() {
   return JSON.stringify({
     id: "streamed",
-    name: "Streamed",
-    version: "1.4.0",
+    name: "[SPORT] Streamed",
+    version: "1.4.1",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
     isEnabled: true,
@@ -114,7 +114,7 @@ function parseListResponse(html, apiUrl) {
       for (const item of stream.sources) {
         const serverName = item.source?.toUpperCase();
         //remove server echo
-        if (serverName === "ECHO") continue;
+        // if (serverName === "ECHO") continue;
         const description = `Event "${title}" is hosted on server ${serverName}.`;
         const encodedData = encodeURIComponent(JSON.stringify({ title, posterUrl, category, description }));
 

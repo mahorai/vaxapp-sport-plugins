@@ -5,8 +5,8 @@
 function getManifest() {
   return JSON.stringify({
     id: "methstreams",
-    name: "MethStreams",
-    version: "1.0.3",
+    name: "[SPORT] MethStreams",
+    version: "1.0.4",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/2Rv6bzP/methstreams-logo.png",
     isEnabled: true,

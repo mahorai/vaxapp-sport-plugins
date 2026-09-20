@@ -5,8 +5,8 @@
 function getManifest() {
   return JSON.stringify({
     id: "xoilac365",
-    name: "XOILAC365",
-    version: "1.0.1",
+    name: "[SPORT] XOILAC365",
+    version: "1.0.2",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/dwWmVjh0/xoilac365-logo.png",
     isEnabled: true,
@@ -236,12 +236,12 @@ function parseMovieDetail(html, apiUrl, datasend) {
           )
         });
         // fallback 02
-        servers.push({
-          name: "FALLBACK 02",
-          episodes: JSON.parse(
-            JSON.stringify(episodes).replaceAll("xl365", "xl")
-          )
-        });
+        // servers.push({
+        //   name: "FALLBACK 02",
+        //   episodes: JSON.parse(
+        //     JSON.stringify(episodes).replaceAll("xl365", "xl")
+        //   )
+        // });
       }
     }
 
@@ -346,7 +346,7 @@ function parseYearsResponse(html) {
 // VARIABLES
 // ======================================
 
-const BASE_DOMAIN = "https://xoilacxts.tv/";
+const BASE_DOMAIN = "https://xoilacxth.tv/";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_ITEM_DETAIL = JSON.stringify({
   id: "",

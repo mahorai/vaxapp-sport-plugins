@@ -4,11 +4,11 @@
 
 function getManifest() {
   return JSON.stringify({
-    id: "ppv",
-    name: "[SPORT] PPV",
-    version: "1.2.4",
+    id: "rockystream",
+    name: "[SPORT] RockyStream",
+    version: "1.0.0",
     baseUrl: BASE_DOMAIN,
-    iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
+    iconUrl: "https://i.ibb.co/PZFwWKKg/rockystream-logo.jpg",
     isEnabled: true,
     isAdult: false,
     type: "MOVIE",
@@ -21,51 +21,46 @@ function getManifest() {
 function getHomeSections() {
   return JSON.stringify([
     { slug: "live", title: "🔴 LIVE", type: "Horizontal", path: "" },
-    { slug: "combat-sports", title: "Combat Sports 🥊", type: "Horizontal", path: "" },
     { slug: "football", title: "Football ⚽", type: "Horizontal", path: "" },
-    { slug: "volleyball", title: "Volleyball 🏐", type: "Horizontal", path: "" },
-    { slug: "motorsports", title: "Motorsports 🏁", type: "Horizontal", path: "" },
-    { slug: "badminton", title: "Badminton 🏸", type: "Horizontal", path: "" },
-    { slug: "golf", title: "Golf 🚩", type: "Horizontal", path: "" },
-    { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
-    { slug: "wrestling", title: "Wrestling 🤼", type: "Horizontal", path: "" },
-    { slug: "arm-wrestling", title: "Arm Wrestling 💪", type: "Horizontal", path: "" },
-    { slug: "basketball", title: "Basketball 🏀", type: "Horizontal", path: "" },
+    { slug: "fight", title: "Fight 🥊", type: "Horizontal", path: "" },
     { slug: "baseball", title: "Baseball ⚾", type: "Horizontal", path: "" },
-    { slug: "ice-hockey", title: "Ice Hockey 🏒", type: "Horizontal", path: "" },
-    { slug: "cricket", title: "Cricket 🏏", type: "Horizontal", path: "" },
-    { slug: "american-football", title: "American Football 🏈", type: "Horizontal", path: "" },
-    { slug: "australian-football", title: "Australian Football 🏈", type: "Horizontal", path: "" },
-    { slug: "rugby", title: "Rugby 🏉", type: "Horizontal", path: "" },
-    { slug: "darts", title: "Darts 🎯", type: "Horizontal", path: "" },
-    { slug: "miscellaneous", title: "Miscellaneous 🏳️‍🌈", type: "Horizontal", path: "" },
-    { slug: "channels", title: "24/7 Streams 📺", type: "Horizontal", path: "" }
-      // ,{ slug: "", title: "", type: "Horizontal", path: "" },
+    {
+      slug: "basketball",
+      title: "Basketball 🏀",
+      type: "Horizontal",
+      path: ""
+    },
+    { slug: "motor", title: "Motor 🏎️", type: "Horizontal", path: "" },
+    { slug: "tennis", title: "Tennis 🎾", type: "Horizontal", path: "" },
+    {
+      slug: "american-football",
+      title: "American Football 🏈",
+      type: "Horizontal",
+      path: ""
+    },
+    {
+      slug: "australian-football",
+      title: "Australian Football 🏈",
+      type: "Horizontal",
+      path: ""
+    },
+    { slug: "hockey", title: "Hockey 🏒", type: "Horizontal", path: "" },
+    { slug: "other", title: "Other 🎯", type: "Grid", path: "" }
   ]);
 }
 
 function getPrimaryCategories() {
   return JSON.stringify([
-    { name: "Combat Sports", slug: "combat-sports" },
     { name: "Football", slug: "football" },
-    { name: "Volleyball", slug: "volleyball" },
-    { name: "Motorsports", slug: "motorsports" },
-    { name: "Badminton", slug: "badminton" },
-    { name: "Golf", slug: "golf" },
-    { name: "Tennis", slug: "tennis" },
-    { name: "Wrestling", slug: "wrestling" },
-    { name: "Arm Wrestling", slug: "arm-wrestling" },
-    { name: "Basketball", slug: "basketball" },
+    { name: "Fight", slug: "fight" },
     { name: "Baseball", slug: "baseball" },
-    { name: "Ice Hockey", slug: "ice-hockey" },
-    { name: "Cricket", slug: "cricket" },
+    { name: "Basketball", slug: "basketball" },
+    { name: "Motor", slug: "motor" },
+    { name: "Tennis", slug: "tennis" },
     { name: "American Football", slug: "american-football" },
     { name: "Australian Football", slug: "australian-football" },
-    { name: "Rugby", slug: "rugby" },
-    { name: "Darts", slug: "darts" },
-    { name: "Miscellaneous", slug: "miscellaneous" },
-    { name: "24/7 Streams", slug: "channels" },
-    // ,{ name: "", slug: "" },
+    { name: "Hockey", slug: "hockey" },
+    { name: "Other", slug: "other" }
   ]);
 }
 
@@ -109,34 +104,28 @@ function getUrlYears() {
 function parseListResponse(html, apiUrl) {
   try {
     const data = JSON.parse(html);
-    let streams = data?.streams || [];
+    let streams = data?.matches || [];
+    console.log("1: ", streams);
     const items = [];
     const category = extractParamFromUrl(apiUrl, "category");
     const keyword = extractParamFromUrl(apiUrl, "search");
 
     if (category) streams = filterStreams(streams, ["category", category]);
     if (keyword) streams = filterStreams(streams, ["search", keyword]);
+    console.log("2: ", streams);
 
     streams.forEach((stream) => {
       items.push({
-        id: "?id=" +
-          encodeURIComponent(stream.id) +
-          "&category=" +
-          encodeURIComponent(
-             category === "live" ? "live" : Object.keys(CATEGORY_MAP).find(
-              (key) => CATEGORY_MAP[key] === stream.category_name
-            )
-          ),
-        quality: stream.always_live
-          ? "LIVE 24/7"
-          : Number(stream.starts_at) <= Math.floor(Date.now() / 1000)
+        id: "?id=" + encodeURIComponent(stream.id),
+        quality:
+          Number(stream.ts_et) <= Math.floor(Date.now() / 1000)
             ? "LIVE"
-            : formatDateTime(stream.starts_at),
-        title: stream.name,
-        posterUrl: stream.poster || FALLBACK_POSTER_URL,
-        backdropUrl: stream.poster || FALLBACK_POSTER_URL,
-        episode_current: "Viewers: " + stream.viewers,
-        lang: `${stream.category_name.toUpperCase()} - ${stream.tag} - ${stream.locale.toUpperCase()}`
+            : formatDateTime(stream.ts_et),
+        title: stream.title,
+        posterUrl: FALLBACK_POSTER_URL,
+        backdropUrl: FALLBACK_POSTER_URL,
+        episode_current: capitalize(stream.league),
+        lang: `${stream.category.toUpperCase()}`
       });
     });
 
@@ -145,7 +134,7 @@ function parseListResponse(html, apiUrl) {
       pagination: { currentPage: 1, totalPages: 1 }
     });
   } catch (error) {
-    console.error("⛔ [parseListResponse in ppv_plugin.js] ERROR MESSAGE: ", error);
+    console.error("⛔ [parseListResponse in rockystream_plugin.js] ERROR MESSAGE: ", error);
     return JSON.stringify({
       items: [],
       pagination: { currentPage: 1, totalPages: 1 }
@@ -160,47 +149,38 @@ function parseSearchResponse(html, apiUrl) {
 function parseMovieDetail(html, apiUrl) {
   try {
     const data = JSON.parse(html);
-    let streams = data.streams || [];
+    let streams = data?.matches || [];
     // filter streams by category
     const episodes = [];
-    const category = extractParamFromUrl(apiUrl, "category");
-    streams = filterStreams(streams, ["category", category]);
     // get stream by param id
     const streamId = extractParamFromUrl(apiUrl, "id");
     const stream = getStream(streams, streamId);
-    const substreams = stream.substreams;
 
-    if (!stream.iframe && (!Array.isArray(substreams) || substreams.length === 0)) return EMPTY_MOVIE_DETAIL;
-    episodes.push({
-      id: stream.iframe,
-      name: `${stream.source_tag} - ${stream.locale.toUpperCase()}`,
-      slug: `${stream.uri_name}-1`
-    });
-    substreams.forEach((item, index) => {
+    if (stream?.streams?.length === 0) return EMPTY_MOVIE_DETAIL;
+    stream.streams.forEach((item) => {
       episodes.push({
-        id: item.iframe,
-        name: `${item.source_tag} - ${item.locale.toUpperCase()}`,
-        slug: `${item.uri_name}-${index + 2}`
+        id: item.link,
+        name: `Channel HD-${item.hd}`,
+        slug: item.link
       });
     });
 
     return JSON.stringify({
       id: getQueryString(apiUrl, `?id=`),
-      title: stream.name,
-      posterUrl: stream.poster || FALLBACK_POSTER_URL,
-      backdropUrl: stream.poster || FALLBACK_POSTER_URL,
-      episode_current: "Viewers: " + stream.viewers,
-      description: `Event "${stream.name}" is hosted on server PPV`,
-      lang: stream.locale,
+      title: stream.title,
+      posterUrl: FALLBACK_POSTER_URL,
+      backdropUrl: FALLBACK_POSTER_URL,
+      episode_current: capitalize(stream.league),
+      description: `Event "${stream.title}" is hosted on server RockyStream`,
+      lang: stream.category,
       servers: [{ name: "ADMIN", episodes: episodes }],
-      quality: stream.always_live
-        ? "LIVE 24/7"
-        : Number(stream.starts_at) <= Math.floor(Date.now() / 1000)
+      quality:
+        Number(stream.ts_et) <= Math.floor(Date.now() / 1000)
           ? "LIVE"
-          : formatDateTime(stream.starts_at),
+          : formatDateTime(stream.ts_et)
     });
   } catch (error) {
-    console.error("⛔ [parseMovieDetail in ppv_plugin.js] ERROR MESSAGE: ", error);
+    console.error("⛔ [parseMovieDetail in rockystream_plugin.js] ERROR MESSAGE: ", error);
     return EMPTY_MOVIE_DETAIL;
   }
 }
@@ -225,7 +205,7 @@ function parseDetailResponse(html, embedUrl) {
       isEmbed: true
     });
   } catch (error) {
-    console.error("⛔ [parseDetailResponse in ppv_plugin.js] ERROR MESSAGE: ", error);
+    console.error("⛔ [parseDetailResponse in rockystream_plugin.js] ERROR MESSAGE: ", error);
     return "{}";
   }
 }
@@ -248,9 +228,8 @@ function parseYearsResponse(html) {
 // VARIABLES
 // ======================================
 
-const BACKUP_DOMAINS = "https://ppv.domains/";
-const BASE_DOMAIN = "https://ppv.st";
-const BASE_API_URL = "https://api.ppv.st/api/streams";
+const BASE_DOMAIN = "https://rockystream.st";
+const BASE_API_URL = "https://rockystream.st/api-event.php";
 const FALLBACK_POSTER_URL = "https://i.ibb.co/rKHf363x/fallback-thumbnail.webp";
 const EMPTY_MOVIE_DETAIL = JSON.stringify({
   id: "",
@@ -260,33 +239,18 @@ const EMPTY_MOVIE_DETAIL = JSON.stringify({
   servers: []
 });
 
-// Use CATEGORY_MAP switching back and forth between slug and category
-const CATEGORY_MAP = {
-  "combat-sports": "Combat Sports",
-  football: "Football",
-  volleyball: "Volleyball",
-  motorsports: "Motorsports",
-  badminton: "Badminton",
-  golf: "Golf",
-  tennis: "Tennis",
-  wrestling: "Wrestling",
-  basketball: "Basketball",
-  baseball: "Baseball",
-  hockey: "Hockey",
-  "american-football": "American Football",
-  "australian-football": "Australian Football",
-  rugby: "Rugby",
-  darts: "Darts",
-  miscellaneous: "Miscellaneous",
-  channels: "24/7 Streams",
-  "arm-wrestling": "Arm Wrestling",
-  "cricket": "Cricket"
-  // ,: ""
-};
-
 // ======================================
 // FUNCTIONS
 // ======================================
+
+function capitalize(str) {
+  // Handle if the string is empty or undefined
+  if (!str) return "";
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
 
 function extractParamFromUrl(url, param) {
   if (!url) return "";
@@ -311,8 +275,8 @@ function formatDateTime(timestamp) {
 
 function getStream(streams, id) {
   if (id)
-    return streams?.find((stream) => {
-      return "" + stream.id === id;
+    return streams?.find((item) => {
+      return "" + item.id === id;
     });
   return {};
 }
@@ -325,34 +289,23 @@ function filterStreams(streams, [filterKey, filterValue]) {
     if (filterValue === "live") {
       // live
       streams.forEach((item) => {
-        item.streams.forEach((stream) => {
-          const isLive =
-            Number(stream.starts_at) <= Math.floor(Date.now() / 1000) &&
-            !stream.always_live;
-          if (isLive) result.push(stream);
-        });
+        const isLive = Number(item.ts_et) <= Math.floor(Date.now() / 1000);
+        if (isLive) result.push(item);
       });
 
-      result.sort((a, b) => parseInt(b.viewers) - parseInt(a.viewers));
       return result;
     }
 
     // normal
-    return (
-      streams.find((item) => {
-        return item.category === CATEGORY_MAP[filterValue];
-      })?.streams || []
-    );
+    return streams.filter((item) => item.category === filterValue) || [];
   }
   // filter streams by search
   if (filterValue && filterKey === "search") {
     streams.forEach((item) => {
-      item.streams.forEach((stream) => {
-        filterValue = filterValue.toLowerCase();
-        const streamName = stream.name.toLowerCase();
-        const isTrue = streamName.indexOf(filterValue) >= 0;
-        if (isTrue) result.push(stream);
-      });
+      filterValue = filterValue.toLowerCase();
+      const streamName = item.title.toLowerCase();
+      const isTrue = streamName.indexOf(filterValue) >= 0;
+      if (isTrue) result.push(item);
     });
 
     return result;
