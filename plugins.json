@@ -5,7 +5,7 @@
       "id": "streamed",
       "name": "[SPORT] Streamed",
       "version": "1.4.1",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/streamed_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
       "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
     },
@@ -13,7 +13,7 @@
       "id": "ppv",
       "name": "[SPORT] PPV",
       "version": "1.2.4",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/ppv_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
       "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
     },
@@ -21,39 +21,39 @@
       "id": "timstreams",
       "name": "[SPORT] Timstreams",
       "version": "1.2.9",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/timstreams_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/timstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/qYJ3gnwZ/timstreams-logo.png",
       "info": "SPORTS (Full HD → 4K) + Global IPTV: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Motorsports (F1, MotoGP), TNT Sport, DAZN, CN, Sky Sports, Canal+, ESPN, FOX, ... v.v"
     },
     {
       "id": "rockystream",
       "name": "[SPORT] RockyStream",
-      "version": "1.0.9",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/embedhd_plugin.js",
-      "iconUrl": "https://i.ibb.co/wrrMVcwk/embedhd-logo.jpg",
+      "version": "1.0.0",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/rockystream_plugin.js",
+      "iconUrl": "https://i.ibb.co/PZFwWKKg/rockystream-logo.jpg",
       "info": "MULTI-SPORTS (HD quality with stable streaming): Football, Soccer, Tennis, Basketball, Hockey, Baseball, Fight Sports, Motorsports, and Other Sports"
     },
-    {
+     {
       "id": "methstreams",
       "name": "[SPORT] MethStreams",
       "version": "1.0.4",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/methstreams_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/methstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/2Rv6bzP/methstreams-logo.png",
       "info": "MULTI-SPORTS: NFL, NBA, MLB, WNBA, MMA, Boxing, F1, CFB, NHL, NCAAB, WWE, TNA, AEW"
     },
-    {
+     {
       "id": "crackstreams",
       "name": "[SPORT] CrackStreams",
       "version": "1.0.4",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/crackstreams_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/crackstreams_plugin.js",
       "iconUrl": "https://i.ibb.co/Mxg5183D/crackstreams-logo.png",
-      "info": "MULTI-SPORTS: NFL, NBA, MLB, WNBA, MMA, Boxing, F1, CFB, NHL, NCAAB, NCAA, WWE"
+      "info": "MULTI-SPORTS: NFL, NBA, MLB, WNBA, MMA, Boxing, F1, CFB, NHL, NCAAB, NCAA, WWE (MethStreams Backup)"
     },
     {
       "id": "xoilacz",
       "name": "[SPORT] XOILACZ",
       "version": "1.0.9",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/xoilacz_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/xoilacz_plugin.js",
       "iconUrl": "https://i.ibb.co/m5rVgxZB/xoilacz-plugin.png",
       "info": "SPORTS, REPLAYS and HIGHLIGHTS"
     },
@@ -61,7 +61,7 @@
       "id": "xoilac365",
       "name": "[SPORT] XOILAC365",
       "version": "1.0.2",
-      "scriptUrl": "https://raw.githubusercontent.com/towrx/archive/refs/heads/main/vaxapp/sports/xoilac365_plugin.js",
+      "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/xoilac365_plugin.js",
       "iconUrl": "https://i.ibb.co/dwWmVjh0/xoilac365-logo.png",
       "info": "SPORTS, REPLAYS and HIGHLIGHTS (XOILACZ Backup)"
     }
