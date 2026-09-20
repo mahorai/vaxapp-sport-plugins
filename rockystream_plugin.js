@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "rockystream",
     name: "[SPORT] RockyStream",
-    version: "1.0.0",
+    version: "1.0.1",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/PZFwWKKg/rockystream-logo.jpg",
     isEnabled: true,
