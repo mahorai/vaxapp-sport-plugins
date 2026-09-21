@@ -28,7 +28,7 @@
     {
       "id": "rockystream",
       "name": "[SPORT] RockyStream",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/rockystream_plugin.js",
       "iconUrl": "https://i.ibb.co/PZFwWKKg/rockystream-logo.jpg",
       "info": "MULTI-SPORTS (HD quality with stable streaming): Football, Soccer, Tennis, Basketball, Hockey, Baseball, Fight Sports, Motorsports, and Other Sports"
