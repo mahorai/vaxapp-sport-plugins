@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "rockystream",
     name: "[SPORT] RockyStream",
-    version: "1.0.1",
+    version: "1.0.2",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/PZFwWKKg/rockystream-logo.jpg",
     isEnabled: true,
@@ -90,14 +90,12 @@ function parseListResponse(html, apiUrl) {
   try {
     const data = JSON.parse(html);
     let streams = data?.matches || [];
-    console.log("1: ", streams);
     const items = [];
     const category = extractParamFromUrl(apiUrl, "category");
     const keyword = extractParamFromUrl(apiUrl, "search");
 
     if (category) streams = filterStreams(streams, ["category", category]);
     if (keyword) streams = filterStreams(streams, ["search", keyword]);
-    console.log("2: ", streams);
 
     streams.forEach((stream) => {
       items.push({
