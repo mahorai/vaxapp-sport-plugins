@@ -6,7 +6,7 @@ function getManifest() {
   return JSON.stringify({
     id: "ppv",
     name: "[SPORT] PPV",
-    version: "1.2.5",
+    version: "1.2.6",
     baseUrl: BASE_DOMAIN,
     iconUrl: "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
     isEnabled: true,
@@ -272,7 +272,7 @@ const CATEGORY_MAP = {
   wrestling: "Wrestling",
   basketball: "Basketball",
   baseball: "Baseball",
-  "ice-hockey": "Hockey",
+  "ice-hockey": "Ice Hockey",
   "american-football": "American Football",
   "australian-football": "Australian Football",
   rugby: "Rugby",
