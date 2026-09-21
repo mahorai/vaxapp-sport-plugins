@@ -7,7 +7,7 @@
       "version": "1.4.1",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/streamed_plugin.js",
       "iconUrl": "https://i.ibb.co/N2mkkD4N/streamed-logo.png",
-      "info": "MULTI-SPORTS: Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
+      "info": "MULTI-SPORTS (Full HD → 4K): Combat Sports (UFC, ONE, Boxing), Football (EPL, UCL), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
     },
     {
       "id": "ppv",
@@ -15,7 +15,7 @@
       "version": "1.2.6",
       "scriptUrl": "https://raw.githubusercontent.com/mahorai/vaxapp-sport-plugins/refs/heads/main/ppv_plugin.js",
       "iconUrl": "https://i.ibb.co/BHQSwhLX/ppv-logo.png",
-      "info": "MULTI-SPORTS: Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
+      "info": "MULTI-SPORTS (Full HD): Combat Sports (UFC, ONE), Football (EPL, UCL, Boxing), Volleyball (VNL, FIVB WC), Motorsports (F1, MotoGP), Golf (PGA, Masters), Tennis (ATP, WTA), Wrestling (WWE, AEW), ... v.v"
     },
     {
       "id": "timstreams",
